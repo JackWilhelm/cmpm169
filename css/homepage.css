@@ -23,13 +23,5 @@
 .two-row {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-
-.two-row>*:nth-child(1) {
-  flex: 2;
-}
-
-.two-row>*:nth-child(2) {
-  flex: 1;
+  align-items: flex;
 }
