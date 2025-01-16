@@ -40,7 +40,7 @@ var tileCount = 10;
 
 var tileWidth;
 var tileHeight;
-var shapeSize = 50;
+var shapeSize = 100;
 var newShapeSize = shapeSize;
 var shapeAngle = 0;
 var maxDist;
@@ -51,12 +51,6 @@ var sizeMode = 0;
 
 function preload() {
   shapes = [];
-  shapes.push(loadImage('data/module_1.svg'));
-  shapes.push(loadImage('data/module_2.svg'));
-  shapes.push(loadImage('data/module_3.svg'));
-  shapes.push(loadImage('data/module_4.svg'));
-  shapes.push(loadImage('data/module_5.svg'));
-  shapes.push(loadImage('data/module_6.svg'));
   shapes.push(loadImage('data/module_7.svg'));
 }
 
@@ -100,9 +94,7 @@ function draw() {
         atan2(mouseY - posY, mouseX - posX) + (0 * (PI / 180)), 
         max(min(e*e, 1),0));
 
-      if (sizeMode == 0) newShapeSize = shapeSize;
-      if (sizeMode == 1) newShapeSize = shapeSize * 1.5 - map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize);
-      if (sizeMode == 2) newShapeSize = map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize);
+      newShapeSize = max(30, min(60, map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)));
 
       push();
       translate(posX, posY);
@@ -115,29 +107,8 @@ function draw() {
 }
 
 function keyReleased() {
-  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
-  if (key == 'd' || key == 'D') sizeMode = (sizeMode + 1) % 3;
-  if (key == 'g' || key == 'G') {
-    tileCount += 5;
-    if (tileCount > 20) {
-      tileCount = 10;
-    }
-    tileWidth = width / tileCount;
-    tileHeight = height / tileCount;
-  }
-
-  if (key == '1') currentShape = shapes[0];
-  if (key == '2') currentShape = shapes[1];
-  if (key == '3') currentShape = shapes[2];
-  if (key == '4') currentShape = shapes[3];
-  if (key == '5') currentShape = shapes[4];
-  if (key == '6') currentShape = shapes[5];
-  if (key == '7') currentShape = shapes[6];
-
   if (keyCode == UP_ARROW) shapeSize += 5;
   if (keyCode == DOWN_ARROW) shapeSize = max(shapeSize - 5, 5);
-  if (keyCode == LEFT_ARROW) shapeAngle += 5;
-  if (keyCode == RIGHT_ARROW) shapeAngle -= 5;
 }
 
 
