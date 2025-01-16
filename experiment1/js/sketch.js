@@ -36,7 +36,8 @@ function resizeScreen() {
 
 'use strict';
 
-var tileCount = 10;
+var tileCountX = 21;
+var tileCountY = 10;
 
 var tileWidth;
 var tileHeight;
@@ -47,6 +48,10 @@ var maxDist;
 var currentShape;
 var shapes;
 var shakeMagnitude = 5;
+var baseMaxShake = 2;
+var maxShake = baseMaxShake;
+var baseMinShake = 0;
+var minShake = baseMinShake;
 
 var sizeMode = 0;
 
@@ -77,9 +82,9 @@ function setup() {
   imageMode(CENTER);
   // set the current shape to the first in the array
   currentShape = shapes[0];
-  for (var gridY = 0; gridY < tileCount; gridY++) {
+  for (var gridY = 0; gridY < tileCountY; gridY++) {
     shapeGrid[gridY] = [];
-    for (var gridX = 0; gridX < tileCount; gridX++) {
+    for (var gridX = 0; gridX < tileCountX; gridX++) {
       shapeGrid[gridY][gridX] = random(shapes);
     }
   }
@@ -93,8 +98,8 @@ function draw() {
   clear();
   background(0);
 
-  for (var gridY = 0; gridY < tileCount; gridY++) {
-    for (var gridX = 0; gridX < tileCount; gridX++) {
+  for (var gridY = 0; gridY < tileCountY; gridY++) {
+    for (var gridX = 0; gridX < tileCountX; gridX++) {
 
       var posX = tileWidth * gridX + tileWidth / 2;
       var posY = tileHeight * gridY + tileWidth / 2;
@@ -128,12 +133,14 @@ function keyReleased() {
 
 function giveShakeInput(posX, posY) {
   return random(-shakeMagnitude, shakeMagnitude)  * 
-  min(0, 
-    lerp(
-    (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50), 
-    0, 
-    (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50)
-  )
+  max(-maxShake,
+    min(-minShake, 
+      lerp(
+        (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50), 
+        0, 
+        (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50)
+      )
+    )
   );
 }
 
@@ -141,4 +148,10 @@ function giveShakeInput(posX, posY) {
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
     // code to run when mouse is pressed
+    maxShake = 100000;
+    minShake = 5;
+    setTimeout(() => {
+      maxShake = baseMaxShake;
+      minShake = baseMinShake;
+    }, 1000);
 }
