@@ -50,6 +50,8 @@ var shakeMagnitude = 5;
 
 var sizeMode = 0;
 
+var shapeGrid = [];
+
 function preload() {
   shapes = [];
   shapes.push(loadImage('data/EyeBrown.svg'));
@@ -75,6 +77,12 @@ function setup() {
   imageMode(CENTER);
   // set the current shape to the first in the array
   currentShape = shapes[0];
+  for (var gridY = 0; gridY < tileCount; gridY++) {
+    shapeGrid[gridY] = [];
+    for (var gridX = 0; gridX < tileCount; gridX++) {
+      shapeGrid[gridY][gridX] = random(shapes);
+    }
+  }
   tileWidth = 83.2;
   tileHeight = 60;
   maxDist = sqrt(pow(width, 2) + pow(height, 2));
@@ -83,6 +91,7 @@ function setup() {
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
   clear();
+  background(0);
 
   for (var gridY = 0; gridY < tileCount; gridY++) {
     for (var gridX = 0; gridX < tileCount; gridX++) {
@@ -105,6 +114,7 @@ function draw() {
       );
       rotate(angle);
       noStroke();
+      currentShape = shapeGrid[gridY][gridX];
       image(currentShape, 0, 0, newShapeSize, newShapeSize);
       pop();
     }
