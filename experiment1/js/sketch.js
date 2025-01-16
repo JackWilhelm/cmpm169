@@ -46,6 +46,7 @@ var shapeAngle = 0;
 var maxDist;
 var currentShape;
 var shapes;
+var shakeMagnitude = 5;
 
 var sizeMode = 0;
 
@@ -95,9 +96,11 @@ function draw() {
         max(min(e*e, 1),0));
 
       newShapeSize = max(30, min(60, map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)));
-
       push();
-      translate(posX, posY);
+      translate(
+        posX + giveShakeInput(posX, posY), 
+        posY + giveShakeInput(posX, posY)
+      );
       rotate(angle);
       noStroke();
       image(currentShape, 0, 0, newShapeSize, newShapeSize);
@@ -109,6 +112,10 @@ function draw() {
 function keyReleased() {
   if (keyCode == UP_ARROW) shapeSize += 5;
   if (keyCode == DOWN_ARROW) shapeSize = max(shapeSize - 5, 5);
+}
+
+function giveShakeInput(posX, posY) {
+  return random(-shakeMagnitude, shakeMagnitude)  * (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50);
 }
 
 
