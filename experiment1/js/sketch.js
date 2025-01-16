@@ -52,7 +52,9 @@ var sizeMode = 0;
 
 function preload() {
   shapes = [];
-  shapes.push(loadImage('data/module_7.svg'));
+  shapes.push(loadImage('data/EyeBrown.svg'));
+  shapes.push(loadImage('data/EyeBlue.svg'));
+  shapes.push(loadImage('data/EyeGreen.svg'));
 }
 
 // setup() function is called once when the program starts
