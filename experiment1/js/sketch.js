@@ -48,10 +48,15 @@ var maxDist;
 var currentShape;
 var shapes;
 var shakeMagnitude = 5;
-var baseMaxShake = 2;
+var baseMaxShake = 1;
 var maxShake = baseMaxShake;
+var extremeMaxShake = 20;
 var baseMinShake = 0;
 var minShake = baseMinShake;
+var extremeMinShake = 5;
+var timeToBeDisturbed = 2000; //ms
+var timeDisturbed;
+var isDisturbed = false;
 
 var sizeMode = 0;
 
@@ -132,6 +137,12 @@ function keyReleased() {
 }
 
 function giveShakeInput(posX, posY) {
+  if (maxShake > baseMaxShake) {
+    maxShake = max(baseMaxShake, lerp(extremeMaxShake, baseMaxShake, (millis() - timeDisturbed)/timeToBeDisturbed));
+  }
+  if (minShake > baseMinShake) {
+    minShake = max(baseMinShake, lerp(extremeMinShake, baseMinShake, (millis() - timeDisturbed)/timeToBeDisturbed));
+  }
   return random(-shakeMagnitude, shakeMagnitude)  * 
   max(-maxShake,
     min(-minShake, 
@@ -147,11 +158,7 @@ function giveShakeInput(posX, posY) {
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
-    // code to run when mouse is pressed
-    maxShake = 100000;
-    minShake = 5;
-    setTimeout(() => {
-      maxShake = baseMaxShake;
-      minShake = baseMinShake;
-    }, 1000);
+  timeDisturbed = millis();
+  maxShake = extremeMaxShake;
+  minShake = extremeMinShake;
 }
