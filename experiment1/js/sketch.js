@@ -115,7 +115,14 @@ function keyReleased() {
 }
 
 function giveShakeInput(posX, posY) {
-  return random(-shakeMagnitude, shakeMagnitude)  * (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50);
+  return random(-shakeMagnitude, shakeMagnitude)  * 
+  min(0, 
+    lerp(
+    (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50), 
+    0, 
+    (map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)/50)
+  )
+  );
 }
 
 
