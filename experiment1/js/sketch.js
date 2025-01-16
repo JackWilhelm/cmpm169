@@ -56,7 +56,7 @@ var minShake = baseMinShake;
 var extremeMinShake = 5;
 var timeToBeDisturbed = 2000; //ms
 var timeDisturbed;
-var isDisturbed = false;
+var avoidDistance = 20;
 
 var sizeMode = 0;
 
@@ -117,11 +117,17 @@ function draw() {
         max(min(e*e, 1),0));
 
       newShapeSize = max(30, min(60, map(dist(mouseX, mouseY, posX, posY), 0, 500, 5, shapeSize)));
+      
       push();
       translate(
         posX + giveShakeInput(posX, posY), 
         posY + giveShakeInput(posX, posY)
       );
+      //var factor = -constrain(map(dist(mouseX, mouseY, posX, posY), 0, avoidDistance, 1, -10), 0, 1);
+      //translate((mouseX - posX) * factor, (mouseY - posY) * factor);
+      translate(
+        -cos(angle) * avoidDistance,
+        -sin(angle) * avoidDistance);
       rotate(angle);
       noStroke();
       currentShape = shapeGrid[gridY][gridX];
