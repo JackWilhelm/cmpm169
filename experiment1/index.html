@@ -32,7 +32,7 @@
 	<main id="content">
 		<section>
 
-			<h1>Experiment X - Subject/Topic</h1>
+			<h1>Experiment 1 - Shameful Eyes</h1>
 
 			<div class="minor-section">
 				<div id="canvas-container">
@@ -45,17 +45,22 @@
 
 			<div class="minor-section">
 				<h2>Description</h2>
-				<p>What are you trying to acomplish with this experiment?</p>
+				<p>You are gazed upon shameful eyes unwillingy to look at you if your too close. Be careful not to disturb them.</p>
+				<p>up/down cursors = increase/decrease minimum eye size</p>
+				<p>click = disturb the eyes</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Describe in detail what you did technically and how it works?</p>
+				<p>Based on <a href="https://editor.p5js.org/generative-design/sketches/P_2_1_1_04">this work</a>
+				where it displays a grid of images each rotated based on the mouses position. Each image rotates to face towards or away from the mouse 
+			using a lerp based on the distance between the mouse and the eye. It then shakes be translating it a random degree on the x and y axis based on a given 
+		shake magnitude and distance. Clicking to disturb the eyes increases this shake magnitude as it slow comes down to a base value over time.</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Each person that worked on the code should reflect on the process, the difficulties, and the successes of the experiment.</p>
+				<p>Jack Wilhelm - The process behind this project involved a lot of lerps, distance tracking, and math. Due to the difficulty tracking and images current position after translation, it was difficult to make further distance based calculations. After playing around with the math and giving a lot of the variables maximum and minumum values to control the projects feel, it really came together.</p>
 			</div>
 
 		</section>
