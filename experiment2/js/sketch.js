@@ -25,7 +25,7 @@ let worldSpotSize = 10;
 let travelDistance = 1;
 let packSize = 3;
 let smellRange = 1;
-let startRandom = true;
+let startRandom = false;
 
 function moveWolf(wolf, packColor) {
   strokeWeight(worldSpotSize);
@@ -159,29 +159,94 @@ function draw() {
   myInstance.myMethod();
 }
 
+function resetPacks() {
+  packs = [
+    {color: "red", x: 0.1, y: 0.1, wolves: []}, 
+    {color: "blue", x: 0.9, y: 0.9, wolves: []}, 
+    {color: "green", x: 0.1, y: 0.9, wolves: []},
+    {color: "purple", x: 0.9, y: 0.1, wolves: []}
+  ];
+}
+
 function keyReleased() {
   if (key == 'q') {
+    resetPacks();
     worldSpotSize = max(1, worldSpotSize - 1);
     setup();
   }
   if (key == 'w') {
+    resetPacks();
     worldSpotSize = 10;
     setup();
   }
   if (key == 'e') {
+    resetPacks();
     worldSpotSize += 1;
     setup();
   }
   if (key == 'a') {
+    resetPacks();
     travelDistance = max(1, travelDistance - 1);
     setup();
   }
   if (key == 's') {
+    resetPacks();
     travelDistance = 1;
     setup();
   }
   if (key == 'd') {
-    travelDistance += 1;
+    resetPacks();
+    travelDistance = min(5, travelDistance + 1);
+    setup();
+  }
+  if (key == 'z') {
+    resetPacks();
+    packSize = max(1, packSize - 1);
+    setup();
+  }
+  if (key == 'x') {
+    resetPacks();
+    packSize = 3;
+    setup();
+  }
+  if (key == 'c') {
+    resetPacks();
+    packSize = min(7, packSize + 1);
+    setup();
+  }
+  if (key == 'i') {
+    resetPacks();
+    smellRange = max(1, smellRange - 1);
+    setup();
+  }
+  if (key == 'o') {
+    resetPacks();
+    smellRange = 1;
+    setup();
+  }
+  if (key == 'p') {
+    resetPacks();
+    smellRange = min(10, smellRange + 1);
+    setup();
+  }
+  if (key == 'n') {
+    resetPacks();
+    startRandom = true;
+    setup();
+  }
+  if (key == 'm') {
+    resetPacks();
+    startRandom = false;
+    setup();
+  }
+  if (key == 'r') {
+    resetPacks();
+    world = [[]];
+    worldSpotSize = 10;
+    travelDistance = 1;
+    packSize = 3;
+    smellRange = 1;
+    startRandom = false;
     setup();
   }
 }
