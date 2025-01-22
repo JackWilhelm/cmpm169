@@ -24,7 +24,8 @@ let world = [[]];
 let worldSpotSize = 10;
 let travelDistance = 1;
 let packSize = 3;
-let smellRange = 2;
+let smellRange = 1;
+let startRandom = true;
 
 function moveWolf(wolf, packColor) {
   strokeWeight(worldSpotSize);
@@ -45,6 +46,11 @@ function moveWolf(wolf, packColor) {
     wolf.x = xOld;
     wolf.y = yOld;
   }
+}
+
+function giveRandomStarts(pack) {
+  pack.x = random();
+  pack.y = random();
 }
 
 function randomAdditionalSpeed() {
@@ -139,6 +145,9 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
+  if (startRandom) {
+    packs.forEach(giveRandomStarts);
+  }
   packs.forEach(setPackStart);
   setupWorld();
 }
@@ -150,7 +159,35 @@ function draw() {
   myInstance.myMethod();
 }
 
+function keyReleased() {
+  if (key == 'q') {
+    worldSpotSize = max(1, worldSpotSize - 1);
+    setup();
+  }
+  if (key == 'w') {
+    worldSpotSize = 10;
+    setup();
+  }
+  if (key == 'e') {
+    worldSpotSize += 1;
+    setup();
+  }
+  if (key == 'a') {
+    travelDistance = max(1, travelDistance - 1);
+    setup();
+  }
+  if (key == 's') {
+    travelDistance = 1;
+    setup();
+  }
+  if (key == 'd') {
+    travelDistance += 1;
+    setup();
+  }
+}
+
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
     // code to run when mouse is pressed
+    
 }
