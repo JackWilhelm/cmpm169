@@ -31,8 +31,9 @@ function moveWolf(wolf, packColor) {
   strokeWeight(1);
   let xOld = wolf.x;
   let yOld = wolf.y;
-  wolf.x += Math.floor(random(-travelDistance, travelDistance+1));
-  wolf.y += Math.floor(random(-travelDistance, travelDistance+1));
+  let speedBoost = randomAdditionalSpeed();
+  wolf.x += Math.floor(random(-travelDistance - speedBoost, travelDistance + 1 + speedBoost));
+  wolf.y += Math.floor(random(-travelDistance - speedBoost, travelDistance + 1 + speedBoost));
   wolf.x = constrain(wolf.x, 0, Math.floor(width/worldSpotSize));
   wolf.y = constrain(wolf.y, 0, Math.floor(height/worldSpotSize));
   if (world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == packColor) {
@@ -41,6 +42,15 @@ function moveWolf(wolf, packColor) {
   } else {
     wolf.x = xOld;
     wolf.y = yOld;
+  }
+}
+
+function randomAdditionalSpeed() {
+  let speed = random();
+  if (speed < 0.9) {
+    return 0;
+  } else {
+    return 1;
   }
 }
 
