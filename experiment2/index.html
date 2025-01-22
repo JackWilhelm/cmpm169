@@ -56,7 +56,13 @@
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Describe in detail what you did technically and how it works?</p>
+				<p>At the start of the program, a 2d array "world" is set up to represent the various
+					points on the screen. Each pack is then filled with wolves that track their own x and y coordinates. Each loop, for each pack, the stroke is set to that packs
+					color and for each wolf in that pack they move pased on certain rules. Each wolf places a spot in its current spot and 2 temp variables hold onto their old x and y.
+					Each wolf then attempts to move to a new spot. A wolf succesfully moves to a spot if A: that spot is unclaimed and B: the wolf randomly decides to move to it based on the 
+					presense of nearby spots of other packs. The more presense, the less likely it will move their. If a wolf succesfully moves to a spot, it will draw a line between its 
+					old spot and new spot. If not, the wolf does not move until the next loop.
+				</p>
 			</div>
 
 			<div class="minor-section">
