@@ -15,38 +15,46 @@ let myInstance;
 let canvasContainer;
 var centerHorz, centerVert;
 let packs = [
-  {color: "red", x: 0.5, y: 0.5}, 
-  {color: "blue", x: 0.5, y: 0.5}, 
-  {color: "green", x: 0.5, y: 0.5},
-  {color: "purple", x: 0.5, y: 0.5}
+  {color: "red", x: 0.1, y: 0.1, wolves: []}, 
+  {color: "blue", x: 0.9, y: 0.9, wolves: []}, 
+  {color: "green", x: 0.1, y: 0.9, wolves: []},
+  {color: "purple", x: 0.9, y: 0.1, wolves: []}
 ];
 let world = [[]];
-let worldSpotSize = 10;
-let travelDistance = 10;
+let worldSpotSize = 5;
+let travelDistance = 1;
+let packSize = 3;
+
+function moveWolf(wolf) {
+  strokeWeight(worldSpotSize);
+  point(wolf.x * worldSpotSize, wolf.y * worldSpotSize);
+  strokeWeight(1);
+  let xOld = wolf.x;
+  let yOld = wolf.y;
+  wolf.x += Math.floor(random(-travelDistance, travelDistance+1));
+  wolf.y += Math.floor(random(-travelDistance, travelDistance+1));
+  wolf.x = constrain(wolf.x, 0, Math.floor(width/worldSpotSize));
+  wolf.y = constrain(wolf.y, 0, Math.floor(height/worldSpotSize));
+  if (world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == wolf.color) {
+    line(xOld * worldSpotSize, yOld * worldSpotSize, wolf.x * worldSpotSize, wolf.y * worldSpotSize);
+    world[wolf.x][wolf.y] = wolf.color;
+  } else {
+    wolf.x = xOld;
+    wolf.y = yOld;
+  }
+}
 
 function movePack(pack) {
   stroke(pack.color);
-  strokeWeight(worldSpotSize);
-  point(pack.x * worldSpotSize, pack.y * worldSpotSize);
-  strokeWeight(1);
-  let xOld = pack.x;
-  let yOld = pack.y;
-  pack.x += Math.floor(random(-travelDistance, travelDistance+1));
-  pack.y += Math.floor(random(-travelDistance, travelDistance+1));
-  pack.x = constrain(pack.x, 0, Math.floor(width/worldSpotSize));
-  pack.y = constrain(pack.y, 0, Math.floor(height/worldSpotSize));
-  if (world[pack.x][pack.y] == "none" || world[pack.x][pack.y] == pack.color) {
-    line(xOld * worldSpotSize, yOld * worldSpotSize, pack.x * worldSpotSize, pack.y * worldSpotSize);
-    world[pack.x][pack.y] = pack.color;
-  } else {
-    pack.x = xOld;
-    pack.y = yOld;
-  }
+  pack.wolves.forEach(moveWolf);
 }
 
 function setPackStart(pack) {
   pack.x = Math.floor(lerp(0, width, pack.x)/worldSpotSize);
   pack.y = Math.floor(lerp(0, height, pack.y)/worldSpotSize);
+  for (let wolf = 0; wolf < packSize; wolf++) {
+    pack.wolves[wolf] = {x: pack.x, y: pack.y};
+  }
 }
 
 function setupWorld() {
