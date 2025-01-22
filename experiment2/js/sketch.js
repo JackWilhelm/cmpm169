@@ -24,6 +24,7 @@ let world = [[]];
 let worldSpotSize = 10;
 let travelDistance = 1;
 let packSize = 3;
+let smellRange = 2;
 
 function moveWolf(wolf, packColor) {
   strokeWeight(worldSpotSize);
@@ -36,7 +37,8 @@ function moveWolf(wolf, packColor) {
   wolf.y += Math.floor(random(-travelDistance - speedBoost, travelDistance + 1 + speedBoost));
   wolf.x = constrain(wolf.x, 0, Math.floor(width/worldSpotSize));
   wolf.y = constrain(wolf.y, 0, Math.floor(height/worldSpotSize));
-  if (world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == packColor) {
+  if ((world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == packColor)
+    && random() < calculateChanceOfMoving(wolf.x, wolf.y, packColor)) {
     line(xOld * worldSpotSize, yOld * worldSpotSize, wolf.x * worldSpotSize, wolf.y * worldSpotSize);
     world[wolf.x][wolf.y] = packColor;
   } else {
@@ -46,12 +48,35 @@ function moveWolf(wolf, packColor) {
 }
 
 function randomAdditionalSpeed() {
-  let speed = random();
-  if (speed < 0.9) {
+  if (random() < 0.9) {
     return 0;
   } else {
     return 1;
   }
+}
+
+function otherColorNearbyPresence(x, y, color) {
+  let presense = 0;
+  for (let i = -2; i <= 2; i++) {
+    for (let j = -2; j <= 2; j++) {
+      if (i == 0 && j == 0) {
+        continue;
+      }
+      if (world[x+i] != null && world[x+i][y+j] != null && world[x+i][y+j] != color && world[x+i][y+j] != "none") {
+        presense += 1;
+      }
+    }
+  }
+  return presense;
+}
+
+function calculateChanceOfMoving(x, y, color) {
+  let presense = otherColorNearbyPresence(x, y, color);
+  let a = 2 * smellRange;
+  a += 1;
+  a = Math.pow(a, 2);
+  a -= 1;
+  return -1 / Math.pow(a - 1, 2) * Math.pow(presense - 1, 2) + 1;
 }
 
 function movePack(pack) {
