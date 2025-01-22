@@ -21,11 +21,11 @@ let packs = [
   {color: "purple", x: 0.9, y: 0.1, wolves: []}
 ];
 let world = [[]];
-let worldSpotSize = 5;
+let worldSpotSize = 10;
 let travelDistance = 1;
 let packSize = 3;
 
-function moveWolf(wolf) {
+function moveWolf(wolf, packColor) {
   strokeWeight(worldSpotSize);
   point(wolf.x * worldSpotSize, wolf.y * worldSpotSize);
   strokeWeight(1);
@@ -35,9 +35,9 @@ function moveWolf(wolf) {
   wolf.y += Math.floor(random(-travelDistance, travelDistance+1));
   wolf.x = constrain(wolf.x, 0, Math.floor(width/worldSpotSize));
   wolf.y = constrain(wolf.y, 0, Math.floor(height/worldSpotSize));
-  if (world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == wolf.color) {
+  if (world[wolf.x][wolf.y] == "none" || world[wolf.x][wolf.y] == packColor) {
     line(xOld * worldSpotSize, yOld * worldSpotSize, wolf.x * worldSpotSize, wolf.y * worldSpotSize);
-    world[wolf.x][wolf.y] = wolf.color;
+    world[wolf.x][wolf.y] = packColor;
   } else {
     wolf.x = xOld;
     wolf.y = yOld;
@@ -46,7 +46,9 @@ function moveWolf(wolf) {
 
 function movePack(pack) {
   stroke(pack.color);
-  pack.wolves.forEach(moveWolf);
+  pack.wolves.forEach(wolf => {
+    moveWolf(wolf, pack.color);
+  });
 }
 
 function setPackStart(pack) {
