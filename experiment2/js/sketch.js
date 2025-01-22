@@ -14,7 +14,29 @@ const VALUE2 = 2;
 let myInstance;
 let canvasContainer;
 var centerHorz, centerVert;
-let x,y;
+let packs = [
+  {color: "red", x: 0.5, y: 0.5}, 
+  {color: "blue", x: 0.5, y: 0.5}, 
+  {color: "green", x: 0.5, y: 0.5},
+  {color: "purple", x: 0.5, y: 0.5}
+];
+
+function movePack(pack) {
+  stroke(pack.color);
+  point(pack.x, pack.y);
+  let xOld = pack.x;
+  let yOld = pack.y;
+  pack.x += random(-5, 5);
+  pack.y += random(-5, 5);
+  pack.x = constrain(pack.x, 0, width);
+  pack.y = constrain(pack.y, 0, height);
+  line(xOld, yOld, pack.x, pack.y);
+}
+
+function setPackStart(pack) {
+  pack.x = lerp(0, width, pack.x);
+  pack.y = lerp(0, height, pack.y);
+}
 
 class MyClass {
     constructor(param1, param2) {
@@ -24,14 +46,7 @@ class MyClass {
 
     myMethod() {
         // code to run when method is called
-        point(x, y);
-        let xOld = x;
-        let yOld = y;
-        x += random(-5, 5);
-        y += random(-5, 5);
-        x = constrain(x, 0, width);
-        y = constrain(y, 0, height);
-        line(xOld, yOld, x, y);
+        packs.forEach(movePack);
     }
 }
 
@@ -41,6 +56,7 @@ function resizeScreen() {
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
   // redrawCanvas(); // Redraw everything based on new size
+  background(255);
 }
 
 // setup() function is called once when the program starts
@@ -58,10 +74,7 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
-  background(0);
-  stroke(255);
-  x = width / 2;
-  y = height / 2;
+  packs.forEach(setPackStart);
 }
 
 // draw() function is called repeatedly, it's the main animation loop
