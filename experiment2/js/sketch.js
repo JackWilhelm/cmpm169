@@ -20,22 +20,38 @@ let packs = [
   {color: "green", x: 0.5, y: 0.5},
   {color: "purple", x: 0.5, y: 0.5}
 ];
+let world = [[]];
 
 function movePack(pack) {
   stroke(pack.color);
   point(pack.x, pack.y);
   let xOld = pack.x;
   let yOld = pack.y;
-  pack.x += random(-5, 5);
-  pack.y += random(-5, 5);
+  pack.x += Math.floor(random(-5, 6));
+  pack.y += Math.floor(random(-5, 6));
   pack.x = constrain(pack.x, 0, width);
   pack.y = constrain(pack.y, 0, height);
-  line(xOld, yOld, pack.x, pack.y);
+  if (world[pack.x][pack.y] == "none" || world[pack.x][pack.y] == pack.color) {
+    line(xOld, yOld, pack.x, pack.y);
+    world[pack.x][pack.y] = pack.color;
+  } else {
+    pack.x = xOld;
+    pack.y = yOld;
+  }
 }
 
 function setPackStart(pack) {
-  pack.x = lerp(0, width, pack.x);
-  pack.y = lerp(0, height, pack.y);
+  pack.x = Math.floor(lerp(0, width, pack.x));
+  pack.y = Math.floor(lerp(0, height, pack.y));
+}
+
+function setupWorld() {
+  for (let x = 0; x < width; x++) {
+    world[x] = [];
+    for (let y = 0; y < height; y++) {
+      world[x][y] = "none";
+    }
+  }
 }
 
 class MyClass {
@@ -75,6 +91,7 @@ function setup() {
   });
   resizeScreen();
   packs.forEach(setPackStart);
+  setupWorld();
 }
 
 // draw() function is called repeatedly, it's the main animation loop
