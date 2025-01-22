@@ -21,18 +21,22 @@ let packs = [
   {color: "purple", x: 0.5, y: 0.5}
 ];
 let world = [[]];
+let worldSpotSize = 10;
+let travelDistance = 10;
 
 function movePack(pack) {
   stroke(pack.color);
-  point(pack.x, pack.y);
+  strokeWeight(worldSpotSize);
+  point(pack.x * worldSpotSize, pack.y * worldSpotSize);
+  strokeWeight(1);
   let xOld = pack.x;
   let yOld = pack.y;
-  pack.x += Math.floor(random(-5, 6));
-  pack.y += Math.floor(random(-5, 6));
-  pack.x = constrain(pack.x, 0, width);
-  pack.y = constrain(pack.y, 0, height);
+  pack.x += Math.floor(random(-travelDistance, travelDistance+1));
+  pack.y += Math.floor(random(-travelDistance, travelDistance+1));
+  pack.x = constrain(pack.x, 0, Math.floor(width/worldSpotSize));
+  pack.y = constrain(pack.y, 0, Math.floor(height/worldSpotSize));
   if (world[pack.x][pack.y] == "none" || world[pack.x][pack.y] == pack.color) {
-    line(xOld, yOld, pack.x, pack.y);
+    line(xOld * worldSpotSize, yOld * worldSpotSize, pack.x * worldSpotSize, pack.y * worldSpotSize);
     world[pack.x][pack.y] = pack.color;
   } else {
     pack.x = xOld;
@@ -41,14 +45,14 @@ function movePack(pack) {
 }
 
 function setPackStart(pack) {
-  pack.x = Math.floor(lerp(0, width, pack.x));
-  pack.y = Math.floor(lerp(0, height, pack.y));
+  pack.x = Math.floor(lerp(0, width, pack.x)/worldSpotSize);
+  pack.y = Math.floor(lerp(0, height, pack.y)/worldSpotSize);
 }
 
 function setupWorld() {
-  for (let x = 0; x < width; x++) {
+  for (let x = 0; x <= width/worldSpotSize; x++) {
     world[x] = [];
-    for (let y = 0; y < height; y++) {
+    for (let y = 0; y <= height/worldSpotSize; y++) {
       world[x][y] = "none";
     }
   }
