@@ -122,12 +122,14 @@ class MyClass {
 }
 
 function resizeScreen() {
+  console.log('here');
   centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
   centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
+  console.log("done");
   // redrawCanvas(); // Redraw everything based on new size
-  background(255);
+  setup();
 }
 
 // setup() function is called once when the program starts
@@ -144,12 +146,15 @@ function setup() {
   $(window).resize(function() {
     resizeScreen();
   });
-  resizeScreen();
+  console.log("done3");
+  resetPacks();
+  world = [[]];
   if (startRandom) {
     packs.forEach(giveRandomStarts);
   }
   packs.forEach(setPackStart);
   setupWorld();
+  background(255);
 }
 
 // draw() function is called repeatedly, it's the main animation loop
