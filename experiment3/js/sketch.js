@@ -59,12 +59,22 @@ function preload() {
 // setup() function is called once when the program starts
 function setup() {
   canvasContainer = $("#canvas-container");
+  let ratio = 0;
   if (photo.width > photo.height) {
-    photo.resize(canvasContainer.width(), 0);
+    ratio = photo.width/canvasContainer.width(); 
+    if (photo.height/ratio > canvasContainer.height()) {
+      photo.resize(0, canvasContainer.height());
+    } else {
+      photo.resize(canvasContainer.width(), 0);
+    }
   } else {
-    photo.resize(0, canvasContainer.height());
+    ratio = photo.height/canvasContainer.height(); 
+    if (photo.width/ratio > canvasContainer.width()) {
+      photo.resize(canvasContainer.width(), 0);
+    } else {
+      photo.resize(0, canvasContainer.height());
+    }
   }
-  
   let canvas = createCanvas(photo.width,  photo.height);
   canvas.parent("canvas-container");
   myInstance = new MyClass("VALUE1", "VALUE2");
@@ -84,6 +94,7 @@ function setup() {
     }
   }
   newPointImpactRadius = int(travelDistance/3);
+  background(255);
 }
 
 // draw() function is called repeatedly, it's the main animation loop
