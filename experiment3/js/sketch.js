@@ -49,7 +49,7 @@ let currentTriangles = [];
 let numOfTriangleWalkers = 100;
 let world = [[]];
 let newPointImpactRadius;
-let framesTillPointFree = numOfTriangleWalkers/100;
+let framesTillPointFree = (numOfTriangleWalkers/100) + 5;
 
 function preload() {
 	photo = loadImage('data/the-last-supper.jpg');
