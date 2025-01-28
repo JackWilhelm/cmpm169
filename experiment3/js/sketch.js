@@ -46,7 +46,7 @@ let photo;
 let alpha = 10;
 let travelDistance = 30;
 let currentTriangles = [];
-let numOfTriangleWalkers = 100;
+let numOfTriangleWalkers = 10;
 let world = [[]];
 let newPointImpactRadius;
 let framesTillPointFree = (numOfTriangleWalkers/100) + 5;
@@ -56,6 +56,7 @@ let photoCounter = 0;
 function preload() {
   photos[0] = loadImage('data/the-last-supper.jpg');
   photos[1] = loadImage('data/picasso.jpeg');
+  photos[2] = loadImage('data/starry-night.jpg')
 	photo = photos[0];
 }
 
@@ -181,7 +182,7 @@ function userInteraction() {
     stroke(0);
   }
   if (keyIsDown(RIGHT_ARROW)) {
-    travelDistance = min(100, travelDistance + 5);
+    travelDistance = min(30, travelDistance + 5);
     newPointImpactRadius = int(travelDistance/3);
   }
   if (keyIsDown(LEFT_ARROW)) {
