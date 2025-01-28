@@ -46,9 +46,9 @@ let photo;
 let alpha = 10;
 let travelDistance = 30;
 let currentTriangles = [];
-let numOfTriangleWalkers = 10;
+let numOfTriangleWalkers = 20;
 let world = [[]];
-let newPointImpactRadius = travelDistance/3;
+let newPointImpactRadius;
 let framesTillPointFree = 20;
 
 function preload() {
@@ -68,6 +68,7 @@ function setup() {
   let canvas = createCanvas(photo.width,  photo.height);
   canvas.parent("canvas-container");
   myInstance = new MyClass("VALUE1", "VALUE2");
+  strokeWeight(0.05);
   noStroke();
   for (let i = 0; i < numOfTriangleWalkers; i++) {
     currentTriangles[i] = [
@@ -82,6 +83,7 @@ function setup() {
       world[x][y] = 0;
     }
   }
+  newPointImpactRadius = int(travelDistance/3);
 }
 
 // draw() function is called repeatedly, it's the main animation loop
@@ -152,5 +154,22 @@ function userInteraction() {
   }
   if (keyIsDown(83)) { //S key
     alpha = max(10, alpha - 1);
+  }
+  if (keyIsDown(90)) { //Z key
+    stroke(255);
+  }
+  if (keyIsDown(88)) { //X key
+    noStroke();
+  }
+  if (keyIsDown(67)) { //C key
+    stroke(0);
+  }
+  if (keyIsDown(RIGHT_ARROW)) { //C key
+    travelDistance = min(100, travelDistance + 5);
+    newPointImpactRadius = int(travelDistance/3);
+  }
+  if (keyIsDown(LEFT_ARROW)) { //C key
+    travelDistance = max(10, travelDistance - 5);
+    newPointImpactRadius = int(travelDistance/3);
   }
 }
