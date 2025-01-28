@@ -50,9 +50,13 @@ let numOfTriangleWalkers = 100;
 let world = [[]];
 let newPointImpactRadius;
 let framesTillPointFree = (numOfTriangleWalkers/100) + 5;
+let photos = [];
+let photoCounter = 0;
 
 function preload() {
-	photo = loadImage('data/the-last-supper.jpg');
+  photos[0] = loadImage('data/the-last-supper.jpg');
+  photos[1] = loadImage('data/picasso.jpeg');
+	photo = photos[0];
 }
 
 // setup() function is called once when the program starts
@@ -103,7 +107,9 @@ function draw() {
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
-    // code to run when mouse is pressed
+  photoCounter += 1;
+  photo = photos[photoCounter%photos.length];
+  setup();
 }
 
 function painting(currentTriangle) {
@@ -174,11 +180,11 @@ function userInteraction() {
   if (keyIsDown(67)) { //C key
     stroke(0);
   }
-  if (keyIsDown(RIGHT_ARROW)) { //C key
+  if (keyIsDown(RIGHT_ARROW)) {
     travelDistance = min(100, travelDistance + 5);
     newPointImpactRadius = int(travelDistance/3);
   }
-  if (keyIsDown(LEFT_ARROW)) { //C key
+  if (keyIsDown(LEFT_ARROW)) {
     travelDistance = max(10, travelDistance - 5);
     newPointImpactRadius = int(travelDistance/3);
   }
