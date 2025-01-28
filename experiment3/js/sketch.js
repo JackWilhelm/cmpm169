@@ -46,15 +46,14 @@ let photo;
 let alpha = 10;
 let travelDistance = 30;
 let currentTriangles = [];
-let numOfTriangleWalkers = 20;
+let numOfTriangleWalkers = 100;
 let world = [[]];
 let newPointImpactRadius;
-let framesTillPointFree = 20;
+let framesTillPointFree = numOfTriangleWalkers/100;
 
 function preload() {
 	photo = loadImage('data/the-last-supper.jpg');
 }
-
 
 // setup() function is called once when the program starts
 function setup() {
@@ -82,9 +81,9 @@ function setup() {
   noStroke();
   for (let i = 0; i < numOfTriangleWalkers; i++) {
     currentTriangles[i] = [
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance)), y:int((photo.height/2) + random(-travelDistance,travelDistance))},
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance)), y:int((photo.height/2) + random(-travelDistance,travelDistance))},
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance)), y:int((photo.height/2) + random(-travelDistance,travelDistance))}
+      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))},
+      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))},
+      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))}
     ]
   }
   for (let x = 0; x <= width; x++) {
@@ -140,8 +139,8 @@ function painting(currentTriangle) {
 
 function makeNewPoint(midPointX, midPointY, currentPoint) {
   let newPoint =  {
-    x: constrain(int(midPointX + random(-travelDistance,travelDistance)),0,width),
-    y: constrain(int(midPointY + random(-travelDistance,travelDistance)),0,height)
+    x: constrain(int(midPointX + random(-travelDistance,travelDistance+1)),0,width),
+    y: constrain(int(midPointY + random(-travelDistance,travelDistance+1)),0,height)
   };
   if (world[newPoint.x][newPoint.y] <= 0) {
     for (let x = -newPointImpactRadius; x <= newPointImpactRadius; x++) {
