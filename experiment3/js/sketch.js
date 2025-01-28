@@ -56,7 +56,11 @@ let photoCounter = 0;
 function preload() {
   photos[0] = loadImage('data/the-last-supper.jpg');
   photos[1] = loadImage('data/picasso.jpeg');
-  photos[2] = loadImage('data/starry-night.jpg')
+  photos[2] = loadImage('data/starry-night.jpg');
+  photos[3] = loadImage('data/mona-lisa.jpg');
+  photos[4] = loadImage('data/self-portrait.jpg');
+  photos[5] = loadImage('data/The_Great_Wave_off_Kanagawa.jpg');
+  photos[6] = loadImage('data/the-scream.jpg');
 	photo = photos[0];
 }
 
