@@ -1,6 +1,6 @@
 // sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+// Author: Jack Wilhelm
+// Date: 1/30/25
 
 // Here is how you might set up an OOP p5.js project
 // Note that p5.js looks for a file called sketch.js
@@ -46,10 +46,10 @@ let photo;
 let alpha = 10;
 let travelDistance = 30;
 let currentTriangles = [];
-let numOfTriangleWalkers = 10;
+let numOfTriangleWalkers = 50;
 let world = [[]];
 let newPointImpactRadius;
-let framesTillPointFree = (numOfTriangleWalkers/100) + 5;
+let framesTillPointFree = (numOfTriangleWalkers/100);
 let photos = [];
 let photoCounter = 0;
 let worldSpotSize = 10;
@@ -123,7 +123,6 @@ function resetCanvas() {
     }
   }
   newPointImpactRadius = int(travelDistance/3);
-  image(photo, 0, 0);
   background(255);
 }
 
