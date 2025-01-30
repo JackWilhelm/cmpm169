@@ -25,8 +25,8 @@ class MyClass {
       for (let i = 0; i < numOfTriangleWalkers; i++) {
         painting(currentTriangles[i]);
       }
-      for (let x = 0; x <= width; x++) {
-        for (let y = 0; y <= height; y++) {
+      for (let x = 0; x < width/worldSpotSize; x++) {
+        for (let y = 0; y < height/worldSpotSize; y++) {
           world[x][y]--;
         }
       }
@@ -52,6 +52,8 @@ let newPointImpactRadius;
 let framesTillPointFree = (numOfTriangleWalkers/100) + 5;
 let photos = [];
 let photoCounter = 0;
+let worldSpotSize = 10;
+let canvas;
 
 function preload() {
   photos[0] = loadImage('data/the-last-supper.jpg');
@@ -67,6 +69,26 @@ function preload() {
 // setup() function is called once when the program starts
 function setup() {
   canvasContainer = $("#canvas-container");
+  canvas = createCanvas(photo.width,  photo.height);
+  canvas.parent("canvas-container");
+  canvas.elt.getContext("2d", { willReadFrequently: true });
+  myInstance = new MyClass("VALUE1", "VALUE2");
+  resetCanvas();
+}
+
+// draw() function is called repeatedly, it's the main animation loop
+function draw() {
+  myInstance.myMethod();
+}
+
+// mousePressed() function is called once after every time a mouse button is pressed
+function mousePressed() {
+  photoCounter += 1;
+  photo = photos[photoCounter%photos.length];
+  resetCanvas();
+}
+
+function resetCanvas() {
   let ratio = 0;
   if (photo.width > photo.height) {
     ratio = photo.width/canvasContainer.width(); 
@@ -83,9 +105,8 @@ function setup() {
       photo.resize(0, canvasContainer.height());
     }
   }
-  let canvas = createCanvas(photo.width,  photo.height);
-  canvas.parent("canvas-container");
-  myInstance = new MyClass("VALUE1", "VALUE2");
+  resizeCanvas(photo.width, photo.height);
+  clear();
   strokeWeight(0.05);
   noStroke();
   for (let i = 0; i < numOfTriangleWalkers; i++) {
@@ -95,26 +116,15 @@ function setup() {
       {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))}
     ]
   }
-  for (let x = 0; x <= width; x++) {
+  for (let x = 0; x <= width/worldSpotSize; x++) {
     world[x] = [];
-    for (let y = 0; y <= height; y++) {
+    for (let y = 0; y <= height/worldSpotSize; y++) {
       world[x][y] = 0;
     }
   }
   newPointImpactRadius = int(travelDistance/3);
+  image(photo, 0, 0);
   background(255);
-}
-
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-  myInstance.myMethod();
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-  photoCounter += 1;
-  photo = photos[photoCounter%photos.length];
-  setup();
 }
 
 function painting(currentTriangle) {
@@ -153,13 +163,13 @@ function makeNewPoint(midPointX, midPointY, currentPoint) {
     x: constrain(int(midPointX + random(-travelDistance,travelDistance+1)),0,width),
     y: constrain(int(midPointY + random(-travelDistance,travelDistance+1)),0,height)
   };
-  if (world[newPoint.x][newPoint.y] <= 0) {
+  if (world[Math.floor(newPoint.x/worldSpotSize)][Math.floor(newPoint.y/worldSpotSize)] <= 0) {
     for (let x = -newPointImpactRadius; x <= newPointImpactRadius; x++) {
       for (let y = -newPointImpactRadius; y <= newPointImpactRadius; y++) {
         world[
-          constrain(newPoint.x - x, 0, width)
+          Math.floor(constrain(newPoint.x - x, 0, width)/worldSpotSize)
         ][
-          constrain(newPoint.y - y, 0, height)
+          Math.floor(constrain(newPoint.y - y, 0, height)/worldSpotSize)
         ] = framesTillPointFree;
       }
     }
