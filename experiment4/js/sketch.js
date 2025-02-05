@@ -64,16 +64,6 @@ function setup() {
   initializeGrid();
 }
 
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-  
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
-}
-
 let initializeGrid = () => {
   thePath = []
   coords = []
@@ -136,26 +126,6 @@ let initializeGrid = () => {
         pn = shuffle([...possibleNeighbors])
         added = true
       }
-    }
-
-    if (pn.length === 0) {
-      p = createVector(
-        floor(random(gridSize)),
-        floor(random(gridSize)),
-        floor(random(gridSize))
-      )
-      let tries = 0
-      while (coords[p.x][p.y][p.z] !== undefined && tries < 100) {
-        p = createVector(
-          floor(random(gridSize)),
-          floor(random(gridSize)),
-          floor(random(gridSize))
-        )
-        tries++
-      }
-      thePath.push(p)
-      coords[p.x][p.y][p.z] = "X"
-      pn = shuffle([...possibleNeighbors])
     }
     if (added) {
       counter++
