@@ -33,6 +33,7 @@ let basePossibleNeighbors = [
   [0, 0, 1],
   [0, 0, -1],
 ];
+let shapeColorMode = 0;
 
 class MyClass {
     constructor(param1, param2) {
@@ -85,7 +86,7 @@ let initializeGrid = () => {
   coords = []
   startFrame = frameCount
 
-  gridSize = floor(random(5, 10))
+  gridSize = 7
   cellSize = cw / (gridSize * sqrt(2))
   MAX_FILL = random(0.5, 0.8)
   rotX = random(0.0005, 0.002) * random([-1, 1])
@@ -98,6 +99,7 @@ let initializeGrid = () => {
       coords[i][j] = []
       for (let k = 0; k < gridSize; k++) {
         coords[i][j][k] = undefined
+
       }
     }
   }
@@ -111,7 +113,6 @@ let initializeGrid = () => {
   coords[p.x][p.y][p.z] = "X"
   
   possibleNeighbors = basePossibleNeighbors.map((v) => createVector(v[0], v[1], v[2]))
-  //let possibleNeighbors = neighbors.map((v) => createVector(v[0], v[1], v[2]));
   let pn = shuffle([...possibleNeighbors])
   let counter = 0
   let totalCells = gridSize * gridSize * gridSize
@@ -162,11 +163,9 @@ function draw() {
 
 
   let drawSpeed = 0.5
-  let rewindSpeed = 2
 
   let drawFrames = (thePath.length / drawSpeed)
-  let rewindFrames = (thePath.length / rewindSpeed)
-  let totalFrames = drawFrames //+ rewindFrames
+  let totalFrames = drawFrames
   let maxIndex = nf <= drawFrames ?
     map(nf, 0, drawFrames, 0, thePath.length, true) :
     map(nf, drawFrames, totalFrames, thePath.length, 0, true)
@@ -198,8 +197,14 @@ function draw() {
       thePath[i-1].y * cellSize,
       thePath[i-1].z * cellSize
     )
-    fill("black")
-    box(10)
+    if (shapeColorMode == 0) {
+      fill("black")
+    } else if (shapeColorMode == 1) {
+      fill("white")
+    } else {
+      fill((i*20)%255, 100, 100)
+    }
+    box(cellSize*min(i/5, 1))
     pop()
     line(
       thePath[i-1].x * cellSize,
@@ -215,6 +220,10 @@ function draw() {
 function keyPressed() {
   if (key === "r") {
     initializeGrid()
+  }
+  if (key === "q") {
+    shapeColorMode++
+    shapeColorMode %= 3;
   }
 }
 
