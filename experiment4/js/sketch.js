@@ -34,6 +34,7 @@ let basePossibleNeighbors = [
   [0, 0, -1],
 ];
 let shapeColorMode = 0;
+let strokeColorMode = 2;
 
 class MyClass {
     constructor(param1, param2) {
@@ -190,7 +191,13 @@ function draw() {
       initializeGrid()
       break
     }
-    stroke((i*20)%255, 100, 100);
+    if (strokeColorMode == 0) {
+      stroke("black")
+    } else if (strokeColorMode == 1) {
+      stroke("white")
+    } else {
+      stroke((i*20)%255, 100, 100)
+    }
     push() 
     translate(
       thePath[i-1].x * cellSize,
@@ -224,6 +231,10 @@ function keyPressed() {
   if (key === "q") {
     shapeColorMode++
     shapeColorMode %= 3;
+  }
+  if (key === "e") {
+    strokeColorMode++
+    strokeColorMode %= 3;
   }
 }
 
