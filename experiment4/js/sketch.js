@@ -1,6 +1,6 @@
 // sketch.js - purpose and description here
-// Author: Jack Wilhelm
-// Date: 1/30/25
+// Author: Your Name
+// Date:
 
 // Here is how you might set up an OOP p5.js project
 // Note that p5.js looks for a file called sketch.js
@@ -15,6 +15,16 @@ let myInstance;
 let canvasContainer;
 var centerHorz, centerVert;
 
+let cw, ch
+let coords = []
+let gridSize
+let cellSize
+let thePath = []
+let startFrame = 0
+let palette
+let MAX_FILL
+let rotX, rotY, rotZ
+
 class MyClass {
     constructor(param1, param2) {
         this.property1 = param1;
@@ -22,15 +32,7 @@ class MyClass {
     }
 
     myMethod() {
-      for (let i = 0; i < numOfTriangleWalkers; i++) {
-        painting(currentTriangles[i]);
-      }
-      for (let x = 0; x < width/worldSpotSize; x++) {
-        for (let y = 0; y < height/worldSpotSize; y++) {
-          world[x][y]--;
-        }
-      }
-      userInteraction();
+        // code to run when method is called
     }
 }
 
@@ -42,164 +44,269 @@ function resizeScreen() {
   // redrawCanvas(); // Redraw everything based on new size
 }
 
-let photo;
-let alpha = 10;
-let travelDistance = 30;
-let currentTriangles = [];
-let numOfTriangleWalkers = 50;
-let world = [[]];
-let newPointImpactRadius;
-let framesTillPointFree = (numOfTriangleWalkers/100);
-let photos = [];
-let photoCounter = 0;
-let worldSpotSize = 10;
-let canvas;
-
-function preload() {
-  photos[0] = loadImage('data/the-last-supper.jpg');
-  photos[1] = loadImage('data/picasso.jpeg');
-  photos[2] = loadImage('data/starry-night.jpg');
-  photos[3] = loadImage('data/mona-lisa.jpg');
-  photos[4] = loadImage('data/self-portrait.jpg');
-  photos[5] = loadImage('data/The_Great_Wave_off_Kanagawa.jpg');
-  photos[6] = loadImage('data/the-scream.jpg');
-	photo = photos[0];
-}
-
 // setup() function is called once when the program starts
 function setup() {
+  // place our canvas, making it fit our container
   canvasContainer = $("#canvas-container");
-  canvas = createCanvas(photo.width,  photo.height);
+  let canvas = createCanvas(canvasContainer.width(), canvasContainer.height(), WEBGL);
   canvas.parent("canvas-container");
-  canvas.elt.getContext("2d", { willReadFrequently: true });
+  // resize canvas is the page is resized
+  // create an instance of the class
   myInstance = new MyClass("VALUE1", "VALUE2");
-  resetCanvas();
+
+  $(window).resize(function() {
+    resizeScreen();
+  });
+  resizeScreen();
+  cw = min(canvasContainer.width(), canvasContainer.height())
+  ch = cw
+  colorMode(HSB);
+  initializeGrid();
 }
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  myInstance.myMethod();
+  
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
-  photoCounter += 1;
-  photo = photos[photoCounter%photos.length];
-  resetCanvas();
+    // code to run when mouse is pressed
 }
 
-function resetCanvas() {
-  let ratio = 0;
-  if (photo.width > photo.height) {
-    ratio = photo.width/canvasContainer.width(); 
-    if (photo.height/ratio > canvasContainer.height()) {
-      photo.resize(0, canvasContainer.height());
-    } else {
-      photo.resize(canvasContainer.width(), 0);
-    }
-  } else {
-    ratio = photo.height/canvasContainer.height(); 
-    if (photo.width/ratio > canvasContainer.width()) {
-      photo.resize(canvasContainer.width(), 0);
-    } else {
-      photo.resize(0, canvasContainer.height());
-    }
-  }
-  resizeCanvas(photo.width, photo.height);
-  clear();
-  strokeWeight(0.05);
-  noStroke();
-  for (let i = 0; i < numOfTriangleWalkers; i++) {
-    currentTriangles[i] = [
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))},
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))},
-      {x:int((photo.width/2) + random(-travelDistance,travelDistance+1)), y:int((photo.height/2) + random(-travelDistance,travelDistance+1))}
-    ]
-  }
-  for (let x = 0; x <= width/worldSpotSize; x++) {
-    world[x] = [];
-    for (let y = 0; y <= height/worldSpotSize; y++) {
-      world[x][y] = 0;
-    }
-  }
-  newPointImpactRadius = int(travelDistance/3);
-  background(255);
-}
+let initializeGrid = () => {
+  thePath = []
+  coords = []
+  startFrame = frameCount
 
-function painting(currentTriangle) {
-  let newPointIndex = int(random(0,3));
-  let midPointX = 0;
-  let midPointY = 0;
-  for (let pointIndex = 0; pointIndex < 3; pointIndex++) {
-    if (pointIndex != newPointIndex) {
-      midPointX += currentTriangle[pointIndex].x;
-      midPointY += currentTriangle[pointIndex].y;
-    }
-  }
-  midPointX /= 2;
-  midPointY /= 2;
-  currentTriangle[newPointIndex] = makeNewPoint(midPointX, midPointY, currentTriangle[newPointIndex]);
-  let centroidX = 0;
-  let centroidY = 0;
-  for (let pointIndex = 0; pointIndex < 3; pointIndex++) {
-    centroidX += currentTriangle[pointIndex].x;
-    centroidY += currentTriangle[pointIndex].y;
-  }
-  centroidX /= 3;
-  centroidY /= 3;
-  let pixelColor = photo.get(centroidX,centroidY);
-	pixelColor[3] = alpha;
-	fill(pixelColor);
-  triangle(
-    currentTriangle[0].x, currentTriangle[0].y,
-    currentTriangle[1].x, currentTriangle[1].y,
-    currentTriangle[2].x, currentTriangle[2].y
-  );
-}
+  gridSize = floor(random(5, 10))
+  cellSize = cw / (gridSize * sqrt(2))
+  MAX_FILL = random(0.5, 0.8)
+  rotX = random(0.0005, 0.002) * random([-1, 1])
+  rotY = random(0.0005, 0.002) * random([-1, 1])
+  rotZ = random(0.0005, 0.002) * random([-1, 1])
 
-function makeNewPoint(midPointX, midPointY, currentPoint) {
-  let newPoint =  {
-    x: constrain(int(midPointX + random(-travelDistance,travelDistance+1)),0,width),
-    y: constrain(int(midPointY + random(-travelDistance,travelDistance+1)),0,height)
-  };
-  if (world[Math.floor(newPoint.x/worldSpotSize)][Math.floor(newPoint.y/worldSpotSize)] <= 0) {
-    for (let x = -newPointImpactRadius; x <= newPointImpactRadius; x++) {
-      for (let y = -newPointImpactRadius; y <= newPointImpactRadius; y++) {
-        world[
-          Math.floor(constrain(newPoint.x - x, 0, width)/worldSpotSize)
-        ][
-          Math.floor(constrain(newPoint.y - y, 0, height)/worldSpotSize)
-        ] = framesTillPointFree;
+  for (let i = 0; i < gridSize; i++) {
+    coords[i] = []
+    for (let j = 0; j < gridSize; j++) {
+      coords[i][j] = []
+      for (let k = 0; k < gridSize; k++) {
+        coords[i][j][k] = undefined
       }
     }
-    return newPoint;
-  } else {
-    return currentPoint;
+  }
+
+  let p = createVector(
+    floor(random(gridSize)),
+    floor(random(gridSize)),
+    floor(random(gridSize))
+  )
+  thePath.push(p)
+  coords[p.x][p.y][p.z] = "X"
+  let possibleNeighbors = [
+    [1, 0, 0],
+    [-1, 0, 0],
+    [0, 1, 0],
+    [0, -1, 0],
+    [0, 0, 1],
+    [0, 0, -1],
+  ].map((v) => createVector(v[0], v[1], v[2]))
+  let pn = shuffle([...possibleNeighbors])
+  let counter = 0
+  let totalCells = gridSize * gridSize * gridSize
+  while (pn.length > 0 && counter < totalCells * MAX_FILL) {
+    let delta = pn.pop()
+    let np = p.copy().add(delta)
+    let added = false
+    if (
+      np.x >= 0 &&
+      np.x < gridSize &&
+      np.y >= 0 &&
+      np.y < gridSize &&
+      np.z >= 0 &&
+      np.z < gridSize
+    ) {
+      let cell = coords[np.x][np.y][np.z]
+      if (cell !== undefined) {
+        // Do nothing, it's already been visited
+      } else {
+        coords[np.x][np.y][np.z] = possibleNeighbors.indexOf(delta)
+        p = np
+        thePath.push(p)
+        pn = shuffle([...possibleNeighbors])
+        added = true
+      }
+    }
+
+    if (pn.length === 0) {
+      p = createVector(
+        floor(random(gridSize)),
+        floor(random(gridSize)),
+        floor(random(gridSize))
+      )
+      let tries = 0
+      while (coords[p.x][p.y][p.z] !== undefined && tries < 100) {
+        p = createVector(
+          floor(random(gridSize)),
+          floor(random(gridSize)),
+          floor(random(gridSize))
+        )
+        tries++
+      }
+      thePath.push(p)
+      coords[p.x][p.y][p.z] = "X"
+      pn = shuffle([...possibleNeighbors])
+    }
+    if (added) {
+      counter++
+    }
+    if (counter >= totalCells * 0.85) {
+    }
   }
 }
 
-function userInteraction() {
-  if (keyIsDown(87)) { //W key
-    alpha = min(255, alpha + 1);
+let seg = (x1, y1, z1, x2, y2, z2) => {
+  let n = cellSize
+  let x = (x1 + x2) / 2
+  let y = (y1 + y2) / 2
+  let z = (z1 + z2) / 2
+  let w = abs(x2 - x1) || n / 10
+  let h = abs(y2 - y1) || n / 10
+  let d = abs(z2 - z1) || n / 10
+  push()
+  translate(x, y, z)
+  drawRod(w, h, d)
+
+  pop()
+}
+
+let drawRod = (w, h, d) => {
+  let rr
+  let rh
+
+  if (w > h && w > d) {
+    rr = h / 2
+    rh = w
+    rotateZ(HALF_PI)
+    cylinder(rr, rh)
+    push()
+    translate(0, rh / 2)
+    sphere(rr)
+    pop()
+    push()
+    translate(0, -rh / 2)
+    sphere(rr)
+    pop()
+    rotateZ(-HALF_PI)
+  } else if (h > w && h > d) {
+    rr = w / 2
+    rh = h
+    cylinder(rr, rh)
+    push()
+    translate(0, rh / 2)
+    sphere(rr)
+    pop()
+    push()
+    translate(0, -rh / 2)
+    sphere(rr)
+    pop()
+  } else {
+    rr = w / 2
+    rh = d
+    rotateX(HALF_PI)
+    cylinder(rr, rh)
+    push()
+    translate(0, rh / 2)
+    sphere(rr)
+    pop()
+    push()
+    translate(0, -rh / 2)
+    sphere(rr)
+    pop()
+    rotateX(-HALF_PI)
   }
-  if (keyIsDown(83)) { //S key
-    alpha = max(10, alpha - 1);
+}
+
+function draw() {
+  background(0, 0, 10)
+  orbitControl()
+
+  let nf = frameCount - startFrame
+
+  push()
+  rotateX(PI / 6)
+  rotateY(PI / 6)
+  rotateZ(PI / 6)
+  rotateX(nf * rotX)
+  rotateY(nf * rotY)
+  rotateZ(nf * rotZ)
+
+
+  let drawSpeed = 0.5
+  let rewindSpeed = 2
+
+  let drawFrames = (thePath.length / drawSpeed)
+  let rewindFrames = (thePath.length / rewindSpeed)
+  let totalFrames = drawFrames + rewindFrames
+  let maxIndex = nf <= drawFrames ?
+    map(nf, 0, drawFrames, 0, thePath.length, true) :
+    map(nf, drawFrames, totalFrames, thePath.length, 0, true)
+
+  if (nf > totalFrames) {
+    initializeGrid()
   }
-  if (keyIsDown(90)) { //Z key
-    stroke(255);
+
+  let cs = -gridSize * cellSize / 2
+  translate(cs, cs, cs)
+
+  thePath.forEach((p, i) => {
+    if (i > maxIndex) {
+      return
+    }
+    push()
+    translate(p.x * cellSize, p.y * cellSize, p.z * cellSize)
+    let c = coords[p.x][p.y][p.z]
+    if (c === "X") {
+    } else {
+      noStroke()
+      fill("white")
+      shininess(40)
+      switch (c) {
+        case 0:
+          seg(0, 0, 0, -cellSize, 0, 0)
+          break
+        case 1:
+          seg(0, 0, 0, cellSize, 0, 0)
+          break
+        case 2:
+          seg(0, 0, 0, 0, -cellSize, 0)
+          break
+        case 3:
+          seg(0, 0, 0, 0, cellSize, 0)
+          break
+        case 4:
+          seg(0, 0, 0, 0, 0, -cellSize)
+          break
+        case 5:
+          seg(0, 0, 0, 0, 0, cellSize)
+          break
+      }
+    }
+
+    pop()
+  })
+  pop()
+}
+
+function keyPressed() {
+  if (key === "r") {
+    initializeGrid()
   }
-  if (keyIsDown(88)) { //X key
-    noStroke();
-  }
-  if (keyIsDown(67)) { //C key
-    stroke(0);
-  }
-  if (keyIsDown(RIGHT_ARROW)) {
-    travelDistance = min(30, travelDistance + 5);
-    newPointImpactRadius = int(travelDistance/3);
-  }
-  if (keyIsDown(LEFT_ARROW)) {
-    travelDistance = max(10, travelDistance - 5);
-    newPointImpactRadius = int(travelDistance/3);
-  }
+}
+
+function colorToRGBString(col) {
+  let r = red(col);
+  let g = green(col);
+  let b = blue(col);
+  return `rgb(${r}, ${g}, ${b})`;
 }
