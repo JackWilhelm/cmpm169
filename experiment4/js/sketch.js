@@ -24,6 +24,15 @@ let startFrame = 0
 let palette
 let MAX_FILL
 let rotX, rotY, rotZ
+let neighbors = [];
+let basePossibleNeighbors = [
+  [1, 0, 0],
+  [-1, 0, 0],
+  [0, 1, 0],
+  [0, -1, 0],
+  [0, 0, 1],
+  [0, 0, -1],
+];
 
 class MyClass {
     constructor(param1, param2) {
@@ -61,6 +70,13 @@ function setup() {
   cw = min(canvasContainer.width(), canvasContainer.height())
   ch = cw
   colorMode(HSB);
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      for (let k = -1; k <= 1; k++) {
+        neighbors.push([i,j,k]);
+      }
+    }
+  }
   initializeGrid();
 }
 
@@ -93,14 +109,9 @@ let initializeGrid = () => {
   )
   thePath.push(p)
   coords[p.x][p.y][p.z] = "X"
-  let possibleNeighbors = [
-    [1, 0, 0],
-    [-1, 0, 0],
-    [0, 1, 0],
-    [0, -1, 0],
-    [0, 0, 1],
-    [0, 0, -1],
-  ].map((v) => createVector(v[0], v[1], v[2]))
+  
+  possibleNeighbors = basePossibleNeighbors.map((v) => createVector(v[0], v[1], v[2]))
+  //let possibleNeighbors = neighbors.map((v) => createVector(v[0], v[1], v[2]));
   let pn = shuffle([...possibleNeighbors])
   let counter = 0
   let totalCells = gridSize * gridSize * gridSize
@@ -127,6 +138,7 @@ let initializeGrid = () => {
         added = true
       }
     }
+
     if (added) {
       counter++
     }
@@ -146,7 +158,6 @@ let seg = (x1, y1, z1, x2, y2, z2) => {
   push()
   translate(x, y, z)
   drawRod(w, h, d)
-
   pop()
 }
 
@@ -230,6 +241,7 @@ function draw() {
   translate(cs, cs, cs)
 
   thePath.forEach((p, i) => {
+    stroke("white")
     if (i > maxIndex) {
       return
     }
@@ -241,26 +253,11 @@ function draw() {
       noStroke()
       fill("white")
       shininess(40)
-      switch (c) {
-        case 0:
-          seg(0, 0, 0, -cellSize, 0, 0)
-          break
-        case 1:
-          seg(0, 0, 0, cellSize, 0, 0)
-          break
-        case 2:
-          seg(0, 0, 0, 0, -cellSize, 0)
-          break
-        case 3:
-          seg(0, 0, 0, 0, cellSize, 0)
-          break
-        case 4:
-          seg(0, 0, 0, 0, 0, -cellSize)
-          break
-        case 5:
-          seg(0, 0, 0, 0, 0, cellSize)
-          break
-      }
+      seg(0,0,0, 
+        -1 * basePossibleNeighbors[c][0] * cellSize,
+        -1 * basePossibleNeighbors[c][1] * cellSize,
+        -1 * basePossibleNeighbors[c][2] * cellSize,
+      )
     }
 
     pop()
