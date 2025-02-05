@@ -179,15 +179,28 @@ function draw() {
   translate(cs, cs, cs)
   for(let i = 1; i < thePath.length; i++) {
     if (i > maxIndex) {
-      if (i > 3) {
+      if (i > 5) {
         thePath.shift();
         if (thePath[i] != thePath[i-1]) {
           thePath[thePath.length] = thePath[thePath.length-1]
         }
       }
       return
+    } 
+    if (thePath[0] == thePath[thePath.length-1]) {
+      initializeGrid()
+      break
     }
-    stroke("white");
+    stroke((i*20)%255, 100, 100);
+    push() 
+    translate(
+      thePath[i-1].x * cellSize,
+      thePath[i-1].y * cellSize,
+      thePath[i-1].z * cellSize
+    )
+    fill("black")
+    box(10)
+    pop()
     line(
       thePath[i-1].x * cellSize,
       thePath[i-1].y * cellSize,
