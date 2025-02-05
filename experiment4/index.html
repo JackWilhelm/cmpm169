@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- This title is used for tabs and bookmarks -->
+	<title>Experiment X - Subject/Topic</title>
+
+	<!-- Use UTF character set, a good idea with any webpage -->
+	<meta charset="UTF-8" />
+	<!-- Set viewport so page remains consistently scaled w narrow devices -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
+	<link rel="stylesheet" type="text/css" href="../css/site.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<!-- Load jQuery library -->
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+	<!-- Load p5.js library -->
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+
+	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
+    <script type="text/javascript" src="../js/site.js" DEFER></script>
+	<!-- Use me for a JavaScript OOP Project -->
+	<script type="text/javascript" src="./js/project.js" DEFER></script>
+	<!-- Use me for a p5.js project -->
+	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+</head>
+<body>
+	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+	<main id="content">
+		<section>
+
+			<h1>Experiment 4 - Triangular Painters</h1>
+
+			<div class="minor-section">
+				<div id="canvas-container">
+					<!-- canvas will be added here -->
+				</div>
+                <div class="fullscreen-box">
+                    <button id="fullscreen">Fullscreen</button>
+                </div>
+			</div>
+
+			<div class="minor-section">
+				<h2>Description</h2>
+				<p>Watch as many triangles paint some of the most famous pieces of art. Each piece is composed
+					of multiple Walkers moving around the screen generating color triangles based on famous paintings.
+				</p>
+				<p>W = Increase alpha</p>
+				<p>S = Decrease alpha</p>
+				<p>Z = White edges</p>
+				<p>X = No edges</p>
+				<p>C = Black edges</p>
+				<p>Left Arrow = Decrease maximum triangle size</p>
+				<p>Right Arrow = Increase maximum triangle size</p>
+				<p>Click = Change painting</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Technical</h2>
+				<p>First, an array of triangles is created. Each triangle consists of 3 x,y coordinates. Next a 2D array (called world) is created to represent the canvas to monitor how recently a new point was added to each area. In each loop for each triangle, one of the coordinates
+					is picked at random to be changed. The new point is based on the midpoint of the other 2 coordinates plus or minus a random amount up/down/left/right. Before this 
+					new coordinate is locked in, it must check the world array to see if the point it is trying to take has recently been affected. If so, the new coordinate is not implemented. If a point on the array has been left alone longer enough
+					(a couple of frames) then the new point can be implemented and that point (and other nearby points) are set to be unclaimable for a couple of frames.
+					The color of the triangle is based on the location of its centroid (center of the triangle). With the centroid coordinate calculated, it gets the color of the respective pixel
+					from a famous painting. The user is able to affect a triangles alpha, maximum size, and stroke color as well as change which painting the triangles are trying to replicate.
+				</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Reflection</h2>
+				<p>Jack Wilhelm - This project went pretty smoothly. Interested in Random Walks from the last project I wanted to continue that but evolve it a little to be random walking triangles
+					rather than just simple points. The implementation of tracking moving triangles was pretty straight forward but there were some difficulties managing that canvas size to properly fit the painting with its various sizes.
+					I did run into some problems with my computer crashing because of the high workload, but by reducing the world array sizes and number of walkers, I was able to make a fast and effective program that prints really interesting pieces.
+				</p>
+			</div>
+
+		</section>
+		<nav id="links" class="minor-section">
+			<!-- Put link back to homepage here. -->
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+            </ul>
+		</nav>
+	</main>
+</body>
+</html>
