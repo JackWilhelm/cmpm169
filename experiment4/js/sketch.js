@@ -142,71 +142,9 @@ let initializeGrid = () => {
     if (added) {
       counter++
     }
-    if (counter >= totalCells * 0.85) {
-    }
   }
 }
 
-let seg = (x1, y1, z1, x2, y2, z2) => {
-  let n = cellSize
-  let x = (x1 + x2) / 2
-  let y = (y1 + y2) / 2
-  let z = (z1 + z2) / 2
-  let w = abs(x2 - x1) || n / 10
-  let h = abs(y2 - y1) || n / 10
-  let d = abs(z2 - z1) || n / 10
-  push()
-  translate(x, y, z)
-  drawRod(w, h, d)
-  pop()
-}
-
-let drawRod = (w, h, d) => {
-  let rr
-  let rh
-
-  if (w > h && w > d) {
-    rr = h / 2
-    rh = w
-    rotateZ(HALF_PI)
-    cylinder(rr, rh)
-    push()
-    translate(0, rh / 2)
-    sphere(rr)
-    pop()
-    push()
-    translate(0, -rh / 2)
-    sphere(rr)
-    pop()
-    rotateZ(-HALF_PI)
-  } else if (h > w && h > d) {
-    rr = w / 2
-    rh = h
-    cylinder(rr, rh)
-    push()
-    translate(0, rh / 2)
-    sphere(rr)
-    pop()
-    push()
-    translate(0, -rh / 2)
-    sphere(rr)
-    pop()
-  } else {
-    rr = w / 2
-    rh = d
-    rotateX(HALF_PI)
-    cylinder(rr, rh)
-    push()
-    translate(0, rh / 2)
-    sphere(rr)
-    pop()
-    push()
-    translate(0, -rh / 2)
-    sphere(rr)
-    pop()
-    rotateX(-HALF_PI)
-  }
-}
 
 function draw() {
   background(0, 0, 10)
@@ -228,7 +166,7 @@ function draw() {
 
   let drawFrames = (thePath.length / drawSpeed)
   let rewindFrames = (thePath.length / rewindSpeed)
-  let totalFrames = drawFrames + rewindFrames
+  let totalFrames = drawFrames //+ rewindFrames
   let maxIndex = nf <= drawFrames ?
     map(nf, 0, drawFrames, 0, thePath.length, true) :
     map(nf, drawFrames, totalFrames, thePath.length, 0, true)
@@ -239,30 +177,26 @@ function draw() {
 
   let cs = -gridSize * cellSize / 2
   translate(cs, cs, cs)
-
-  thePath.forEach((p, i) => {
-    stroke("white")
+  for(let i = 1; i < thePath.length; i++) {
     if (i > maxIndex) {
+      if (i > 3) {
+        thePath.shift();
+        if (thePath[i] != thePath[i-1]) {
+          thePath[thePath.length] = thePath[thePath.length-1]
+        }
+      }
       return
     }
-    push()
-    translate(p.x * cellSize, p.y * cellSize, p.z * cellSize)
-    let c = coords[p.x][p.y][p.z]
-    if (c === "X") {
-    } else {
-      noStroke()
-      fill("white")
-      shininess(40)
-      seg(0,0,0, 
-        -1 * basePossibleNeighbors[c][0] * cellSize,
-        -1 * basePossibleNeighbors[c][1] * cellSize,
-        -1 * basePossibleNeighbors[c][2] * cellSize,
-      )
-    }
-
-    pop()
-  })
-  pop()
+    stroke("white");
+    line(
+      thePath[i-1].x * cellSize,
+      thePath[i-1].y * cellSize,
+      thePath[i-1].z * cellSize,
+      thePath[i].x * cellSize,
+      thePath[i].y * cellSize,
+      thePath[i].z * cellSize,
+    )
+  }
 }
 
 function keyPressed() {
