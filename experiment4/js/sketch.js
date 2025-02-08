@@ -35,6 +35,14 @@ let basePossibleNeighbors = [
 ];
 let shapeColorMode = 0;
 let strokeColorMode = 2;
+let p;
+
+let head;
+
+// Load the file and create a p5.Geometry object.
+function preload() {
+  head = loadModel('data/Head.obj');
+}
 
 class MyClass {
     constructor(param1, param2) {
@@ -88,7 +96,7 @@ let initializeGrid = () => {
   startFrame = frameCount
 
   gridSize = 7
-  cellSize = cw / (gridSize * sqrt(2))
+  cellSize = (cw - 400) / (gridSize * sqrt(2))
   MAX_FILL = random(0.5, 0.8)
   rotX = random(0.0005, 0.002) * random([-1, 1])
   rotY = random(0.0005, 0.002) * random([-1, 1])
@@ -105,14 +113,13 @@ let initializeGrid = () => {
     }
   }
 
-  let p = createVector(
+  p = createVector(
     floor(random(gridSize)),
     floor(random(gridSize)),
     floor(random(gridSize))
   )
   thePath.push(p)
   coords[p.x][p.y][p.z] = "X"
-  
   possibleNeighbors = basePossibleNeighbors.map((v) => createVector(v[0], v[1], v[2]))
   let pn = shuffle([...possibleNeighbors])
   let counter = 0
@@ -140,20 +147,17 @@ let initializeGrid = () => {
         added = true
       }
     }
-
     if (added) {
       counter++
     }
   }
 }
-
-
 function draw() {
   background(0, 0, 10)
   orbitControl()
 
   let nf = frameCount - startFrame
-
+  spinningHead();
   push()
   rotateX(PI / 6)
   rotateY(PI / 6)
@@ -161,9 +165,11 @@ function draw() {
   rotateX(nf * rotX)
   rotateY(nf * rotY)
   rotateZ(nf * rotZ)
+  
+  
 
 
-  let drawSpeed = 0.5
+  let drawSpeed = 0.9
 
   let drawFrames = (thePath.length / drawSpeed)
   let totalFrames = drawFrames
@@ -174,19 +180,16 @@ function draw() {
   if (nf > totalFrames) {
     initializeGrid()
   }
-
   let cs = -gridSize * cellSize / 2
-  translate(cs, cs, cs)
+  translate(cs, cs-100, cs)
   for(let i = 1; i < thePath.length; i++) {
     if (i > maxIndex) {
-      if (i > 5) {
+      if (i > 1) {
         thePath.shift();
-        if (thePath[i] != thePath[i-1]) {
-          thePath[thePath.length] = thePath[thePath.length-1]
-        }
+        thePath[thePath.length] = thePath[thePath.length-1]
       }
       return
-    } 
+    }
     if (thePath[0] == thePath[thePath.length-1]) {
       initializeGrid()
       break
@@ -196,7 +199,7 @@ function draw() {
     } else if (strokeColorMode == 1) {
       stroke("white")
     } else {
-      stroke((i*20)%255, 100, 100)
+      stroke((i*20)%255, 75, 75)
     }
     push() 
     translate(
@@ -209,7 +212,7 @@ function draw() {
     } else if (shapeColorMode == 1) {
       fill("white")
     } else {
-      fill((i*20)%255, 100, 100)
+      fill((i*20)%255, 75, 75)
     }
     box(cellSize*min(i/5, 1))
     pop()
@@ -222,6 +225,21 @@ function draw() {
       thePath[i].z * cellSize,
     )
   }
+}
+
+let f = 0;
+function spinningHead() {
+  push()
+  fill("black")
+  stroke("black")
+  translate(50,900,-800)
+  rotateX(HALF_PI);
+  rotateZ(f/(50*PI))
+  f++
+  scale(25)
+  
+  model(head)
+  pop()
 }
 
 function keyPressed() {
