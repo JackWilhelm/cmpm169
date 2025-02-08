@@ -237,7 +237,6 @@ function spinningHead() {
   rotateZ(f/(50*PI))
   f++
   scale(25)
-  
   model(head)
   pop()
 }
