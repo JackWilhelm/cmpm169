@@ -1722,7 +1722,7 @@ Chapter 50
 [50:25] So Joseph made the Israelites swear, saying, "When God comes to you, you shall carry up my bones from here."
 [50:26] And Joseph died, being one hundred ten years old; he was embalmed and placed in a coffin in Egypt.`
 
-let preText = "HHLKHH\nHHHHHHH\n\n\n?????????????????????????\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHHH?HHHHHHH\nHHHHHHHHHHHH\nHHHHHHHH\nHHHHH?HH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHHHHHHLHLHLLLL????????????????????LLLLLLLLHHHHHHHLHLHLLLLLLLLLLLLHHHHHHH?HHHHHLHLHLLLLLLLLLLLLHHHHHHHHHHHHHLKHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHHHHHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHH????????????????????HHHHHH\nHHHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHHHHHHHHLKHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHHHHHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHH\nHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHHHH\nHHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHHHHHHLHLHLLLLLLLLLLLLHHHHHHHHHHHHHH"
+let preText = "DDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDD"
 function preload() {
   font = loadFont('data/miso-bold.ttf');
   shapeSpace = loadImage('data/space.svg');
@@ -1777,7 +1777,7 @@ let worldAngle = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  return;
+  //return;
   if (preText.length > 0) {
     textTyped += preText[0];
     preText = preText.slice(1);
@@ -1786,22 +1786,16 @@ function draw() {
   }
   background(255);
   
-  
-  if (mouseIsPressed && mouseButton == LEFT) {
-    centerX = mouseX - offsetX;
-    centerY = mouseY - offsetY;
-  }
-
   // allways produce the same sequence of random numbers
   randomSeed(actRandomSeed);
-
+  
   translate(centerX, centerY);
   scale(zoom);
-
+  
   for (var i = 0; i < textTyped.length; i++) {
     var letter = textTyped.charAt(i);
     var letterWidth = textWidth(letter);
-
+  
     // ------ letter rule table ------
     switch (letter) {
     case ' ': // space
@@ -1818,46 +1812,46 @@ function draw() {
         rotate(-QUARTER_PI);
       }
       break;
-
+  
     case ',':
       image(shapeComma, 1, -15);
       translate(35, 15);
       rotate(QUARTER_PI);
       break;
-
+  
     case '.':
       image(shapePeriod, 1, -55);
       translate(56, -56);
       rotate(-HALF_PI);
       break;
-
+  
     case '!':
       image(shapeExclamationmark, 1, -27);
       translate(42.5, -17.5);
       rotate(-QUARTER_PI);
       break;
-
+  
     case '?':
       image(shapeQuestionmark, 1, -27);
       translate(42.5, -17.5);
       rotate(-QUARTER_PI);
       break;
-
+  
     case '\n': // return
       image(shapeReturn, 1, -15);
       translate(1, 10);
       rotate(PI);
       break;
-
+  
     default: // all others
       text(letter, 0, 0);
       translate(letterWidth, 0);
     }
   }
-
+  
   var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
-
+  
     // ------ letter rule table ------
     switch (letter) {
     case ' ': // space
@@ -1874,45 +1868,45 @@ function draw() {
         rotate(-QUARTER_PI);
       }
       break;
-
+  
     case ',':
       image(shapeComma, 1, -15);
       translate(35, 15);
       rotate(QUARTER_PI);
       break;
-
+  
     case '.':
-      image(shapePeriod, 1, -55);
-      translate(56, -56);
-      rotate(-HALF_PI);
+      centerX -= cos(worldAngle) * (56/1.33) - sin(worldAngle) * (-56/1.33);
+      centerY -= sin(worldAngle) * (56/1.33) + cos(worldAngle) * (-56/1.33);
+      worldAngle -= HALF_PI;
       break;
-
+  
     case '!':
-      image(shapeExclamationmark, 1, -27);
-      translate(42.5, -17.5);
-      rotate(-QUARTER_PI);
-      break;
-
-    case '?':
-      image(shapeQuestionmark, 1, -27);
-      translate(42.5, -17.5);
-      centerX += cos(worldAngle) * 42.5 - sin(worldAngle) * -17.5;
-      centerY += sin(worldAngle) * 42.5 + cos(worldAngle) * -17.5;
+      centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
+      centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
       worldAngle -= QUARTER_PI;
       break;
-
-    case '\n': // return
-      image(shapeReturn, 1, -15);
-      worldAngle += PI;
+  
+    case '?':
+      centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
+      centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
+      worldAngle -= QUARTER_PI;
       break;
-
+  
+    case '\n': // return
+      worldAngle += PI;
+      centerY += cos(worldAngle) * (1/1.33) - sin(worldAngle) * (10/1.33);
+      centerY += sin(worldAngle) * (1/1.33) + cos(worldAngle) * (10/1.33);
+      break;
+  
     default: // all others
       centerX += cos(worldAngle) * (-letterWidth/1.33) - sin(worldAngle) * 0;
+      centerY += sin(worldAngle) * (-letterWidth/1.33) + cos(worldAngle) * 0;
     }
-
+  
   // blink cursor after text
   if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
-  console.log(centerX, centerY);
+  console.log(worldAngle/PI, (-letterWidth/1.33),centerX, centerY);
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
@@ -1927,12 +1921,6 @@ function mousePressed() {
   return;
 }
 background(255);
-
-
-if (mouseIsPressed && mouseButton == LEFT) {
-  centerX = mouseX - offsetX;
-  centerY = mouseY - offsetY;
-}
 
 // allways produce the same sequence of random numbers
 randomSeed(actRandomSeed);
@@ -2024,37 +2012,37 @@ var letter = textTyped.charAt(textTyped.length-1);
     break;
 
   case '.':
-    image(shapePeriod, 1, -55);
-    translate(56, -56);
-    rotate(-HALF_PI);
+    centerX -= cos(worldAngle) * (56/1.33) - sin(worldAngle) * (-56/1.33);
+    centerY -= sin(worldAngle) * (56/1.33) + cos(worldAngle) * (-56/1.33);
+    worldAngle -= HALF_PI;
     break;
 
   case '!':
-    image(shapeExclamationmark, 1, -27);
-    translate(42.5, -17.5);
-    rotate(-QUARTER_PI);
+    centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
+    centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
+    worldAngle -= QUARTER_PI;
     break;
 
   case '?':
-    image(shapeQuestionmark, 1, -27);
-    translate(42.5, -17.5);
-    centerX += cos(worldAngle) * 42.5 - sin(worldAngle) * -17.5;
-    centerY += sin(worldAngle) * 42.5 + cos(worldAngle) * -17.5;
+    centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
+    centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
     worldAngle -= QUARTER_PI;
     break;
 
   case '\n': // return
-    image(shapeReturn, 1, -15);
     worldAngle += PI;
+    centerY += cos(worldAngle) * (1/1.33) - sin(worldAngle) * (10/1.33);
+    centerY += sin(worldAngle) * (1/1.33) + cos(worldAngle) * (10/1.33);
     break;
 
   default: // all others
     centerX += cos(worldAngle) * (-letterWidth/1.33) - sin(worldAngle) * 0;
+    centerY += sin(worldAngle) * (-letterWidth/1.33) + cos(worldAngle) * 0;
   }
 
 // blink cursor after text
 if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
-console.log(centerX, centerY);
+console.log(worldAngle/PI, (-letterWidth/1.33),centerX, centerY);
 }
 
 function keyPressed() {
