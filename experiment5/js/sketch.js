@@ -1778,6 +1778,7 @@ let worldAngle = 0;
 let pause = false;
 let holdCenterX = 0;
 let holdCenterY = 0;
+let magicNumber = 1.33;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1802,8 +1803,10 @@ function draw() {
   // allways produce the same sequence of random numbers
   randomSeed(actRandomSeed);
   
+  
   translate(centerX, centerY);
   scale(zoom);
+  
   let randomSpaceTracker = 0;
   
   for (var i = 0; i < textTyped.length; i++) {
@@ -1864,6 +1867,8 @@ function draw() {
       translate(letterWidth, 0);
     }
   }
+  
+
   if (!pause) {
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
@@ -1874,50 +1879,42 @@ function draw() {
       // 50% left, 50% right
       var dir = randomSpaceTracker;
       if (dir == 0) {
-        centerX -= cos(worldAngle) * (4/1.33) - sin(worldAngle) * (1/1.33);
-        centerY -= sin(worldAngle) * (4/1.33) + cos(worldAngle) * (1/1.33);
+        moveCenters(4,1);
         worldAngle += QUARTER_PI;
       }
       if (dir == 1) {
-        centerX -= cos(worldAngle) * (14/1.33) - sin(worldAngle) * (-5/1.33);
-        centerY -= sin(worldAngle) * (14/1.33) + cos(worldAngle) * (-5/1.33);
+        moveCenters(14,-5);
         worldAngle -= QUARTER_PI;
       }
       break;
   
     case ',':
-      centerX -= cos(worldAngle) * (35/1.33) - sin(worldAngle) * (15/1.33);
-      centerY -= sin(worldAngle) * (35/1.33) + cos(worldAngle) * (15/1.33);
+      moveCenters(35,15);
       worldAngle += QUARTER_PI;
       break;
   
     case '.':
-      centerX -= cos(worldAngle) * (56/1.33) - sin(worldAngle) * (-56/1.33);
-      centerY -= sin(worldAngle) * (56/1.33) + cos(worldAngle) * (-56/1.33);
+      moveCenters(56,-56);
       worldAngle -= HALF_PI;
       break;
   
     case '!':
-      centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
-      centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
+      moveCenters(42.5, -17.5);
       worldAngle -= QUARTER_PI;
       break;
   
     case '?':
-      centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
-      centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
+      moveCenters(42.5,-17.5);
       worldAngle -= QUARTER_PI;
       break;
   
     case '\n': // return
+      moveCenters(1,10);
       worldAngle += PI;
-      centerY += cos(worldAngle) * (1/1.33) - sin(worldAngle) * (10/1.33);
-      centerY += sin(worldAngle) * (1/1.33) + cos(worldAngle) * (10/1.33);
       break;
   
     default: // all others
-      centerX += cos(worldAngle) * (-letterWidth/1.33) - sin(worldAngle) * 0;
-      centerY += sin(worldAngle) * (-letterWidth/1.33) + cos(worldAngle) * 0;
+      moveCenters(letterWidth,0);
     }
   }
   
@@ -1930,6 +1927,19 @@ function mousePressed() {
     // code to run when mouse is pressed
     offsetX = mouseX - centerX;
     offsetY = mouseY - centerY;
+}
+
+function moveCenters(dx, dy) {
+  centerX -= moveCenterX(dx, dy);
+  centerY -= moveCenterY(dx, dy);
+}
+
+function moveCenterX(dx, dy){
+  return cos(worldAngle) * (dx/magicNumber) - sin(worldAngle) * (dy/magicNumber);
+}
+
+function moveCenterY(dx, dy){
+  return sin(worldAngle) * (dx/magicNumber) + cos(worldAngle) * (dy/magicNumber);
 }
 
 function keyPressed() {
