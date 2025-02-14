@@ -1766,7 +1766,9 @@ function setup() {
   zoom = 0.75;
   holdZoom = zoom;
 
-  actRandomSeed = 6;
+  frameRate(60);
+
+  actRandomSeed = new Date().getTime();
 
   cursor(HAND);
   textFont(font, 25);
@@ -1781,6 +1783,7 @@ let holdCenterX = 0;
 let holdCenterY = 0;
 let holdZoom = 0;
 let magicNumber = 1.33;
+let randomSpaceTracker = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1809,7 +1812,7 @@ function draw() {
   translate(centerX, centerY);
   scale(zoom);
   
-  let randomSpaceTracker = 0;
+  randomSpaceTracker = 0;
   
   for (var i = 0; i < textTyped.length; i++) {
     var letter = textTyped.charAt(i);
@@ -1981,8 +1984,81 @@ function keyPressed() {
 }
 
 function keyTyped() {
+  if (!pause) {
+    return;
+  }
   if (keyCode >= 32) {
     textTyped += key;
+    var letter = textTyped.charAt(textTyped.length-1);
+    var letterWidth = textWidth(letter);
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = floor(random(0, 2));;
+      if (dir == 0) {
+        randomSpaceTracker = 0;
+        moveCenters(4,1);
+        holdCenterX -= moveCenterX(4,1);
+        holdCenterY -= moveCenterY(4,1);
+        worldAngle += QUARTER_PI;
+      }
+      if (dir == 1) {
+        randomSpaceTracker = 0;
+        moveCenters(14,-5);
+        holdCenterX -= moveCenterX(14,-5);
+        holdCenterY -= moveCenterY(15,-5);
+        worldAngle -= QUARTER_PI;
+      }
+      break;
+  
+    case ',':
+      moveCenters(35,15);
+      holdCenterX -= moveCenterX(35,15);
+      holdCenterY -= moveCenterY(35,15);
+      worldAngle += QUARTER_PI;
+      break;
+  
+    case '.':
+      moveCenters(56,-56);
+      holdCenterX -= moveCenterX(56,-56);
+      holdCenterY -= moveCenterY(56,-56);
+      worldAngle -= HALF_PI;
+      break;
+  
+    case '!':
+      moveCenters(42.5, -17.5);
+      holdCenterX -= moveCenterX(42.5,-17.5);
+      holdCenterY -= moveCenterY(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '?':
+      moveCenters(42.5,-17.5);
+      holdCenterX -= moveCenterX(42.5,-17.5);
+      holdCenterY -= moveCenterY(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '\n': // return
+      worldAngle -= PI;
+      moveCenters(1,10);
+      holdCenterX -= moveCenterX(1,10);
+      holdCenterY -= moveCenterY(1,10);
+      break;
+  
+    default: // all others
+      moveCenters(letterWidth,0);
+      holdCenterX -= moveCenterX(letterWidth,0);
+      holdCenterY -= moveCenterY(letterWidth,0);
+    }
     print(textTyped);
+  }
+  if(keyCode == 13) { //\n
+    worldAngle -= PI;
+    moveCenters(1,10);
+    holdCenterX -= moveCenterX(1,10);
+    holdCenterY -= moveCenterY(1,10);
   }
 }
