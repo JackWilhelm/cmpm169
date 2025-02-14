@@ -1773,17 +1773,28 @@ function setup() {
 }
 
 let worldAngle = 0;
+let pause = false;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  if (preText.length > 0) {
-    textTyped += preText[0];
-    preText = preText.slice(1);
+  if (pause) {
+    if (mouseIsPressed && mouseButton == LEFT) {
+      centerX = mouseX - offsetX;
+      centerY = mouseY - offsetY;
+    }
   } else {
-    return;
+    if (preText.length > 0) {
+      textTyped += preText[0];
+      preText = preText.slice(1);
+    } else {
+      return;
+    }
   }
-  background(255);
   
+  
+
+  background(255);
+
   // allways produce the same sequence of random numbers
   randomSeed(actRandomSeed);
   
@@ -1849,7 +1860,7 @@ function draw() {
       translate(letterWidth, 0);
     }
   }
-  
+  if (!pause) {
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
   
@@ -1904,149 +1915,17 @@ function draw() {
       centerX += cos(worldAngle) * (-letterWidth/1.33) - sin(worldAngle) * 0;
       centerY += sin(worldAngle) * (-letterWidth/1.33) + cos(worldAngle) * 0;
     }
+  }
   
   // blink cursor after text
   if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
-  console.log(worldAngle/PI, (-letterWidth/1.33),centerX, centerY);
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
     // code to run when mouse is pressed
-  //offsetX = mouseX - centerX;
- //offsetY = mouseY - centerY;
- if (preText.length > 0) {
-  textTyped += preText[0];
-  preText = preText.slice(1);
-} else {
-  return;
-}
-background(255);
-
-// allways produce the same sequence of random numbers
-randomSeed(actRandomSeed);
-
-translate(centerX, centerY);
-scale(zoom);
-let randomSpaceTracker = 0;
-
-for (var i = 0; i < textTyped.length; i++) {
-  var letter = textTyped.charAt(i);
-  var letterWidth = textWidth(letter);
-
-  // ------ letter rule table ------
-  switch (letter) {
-  case ' ': // space
-    // 50% left, 50% right
-    var dir = floor(random(0, 2));
-    if (dir == 0) {
-      randomSpaceTracker = 0;
-      image(shapeSpace, 1, -15);
-      translate(4, 1);
-      rotate(QUARTER_PI);
-    }
-    if (dir == 1) {
-      randomSpaceTracker = 1;
-      image(shapeSpace2, 1, -15);
-      translate(14, -5);
-      rotate(-QUARTER_PI);
-    }
-    break;
-
-  case ',':
-    image(shapeComma, 1, -15);
-    translate(35, 15);
-    rotate(QUARTER_PI);
-    break;
-
-  case '.':
-    image(shapePeriod, 1, -55);
-    translate(56, -56);
-    rotate(-HALF_PI);
-    break;
-
-  case '!':
-    image(shapeExclamationmark, 1, -27);
-    translate(42.5, -17.5);
-    rotate(-QUARTER_PI);
-    break;
-
-  case '?':
-    image(shapeQuestionmark, 1, -27);
-    translate(42.5, -17.5);
-    rotate(-QUARTER_PI);
-    break;
-
-  case '\n': // return
-    image(shapeReturn, 1, -15);
-    translate(1, 10);
-    rotate(PI);
-    break;
-
-  default: // all others
-    text(letter, 0, 0);
-    translate(letterWidth, 0);
-  }
-}
-
-  var letter = textTyped.charAt(textTyped.length-1);
-  var letterWidth = textWidth(letter);
-
-  // ------ letter rule table ------
-  switch (letter) {
-  case ' ': // space
-    // 50% left, 50% right
-    var dir = randomSpaceTracker;
-    if (dir == 0) {
-      centerX -= cos(worldAngle) * (4/1.33) - sin(worldAngle) * (1/1.33);
-      centerY -= sin(worldAngle) * (4/1.33) + cos(worldAngle) * (1/1.33);
-      worldAngle += QUARTER_PI;
-    }
-    if (dir == 1) {
-      centerX -= cos(worldAngle) * (14/1.33) - sin(worldAngle) * (-5/1.33);
-      centerY -= sin(worldAngle) * (14/1.33) + cos(worldAngle) * (-5/1.33);
-      worldAngle -= QUARTER_PI;
-    }
-    break;
-
-  case ',':
-    centerX -= cos(worldAngle) * (35/1.33) - sin(worldAngle) * (15/1.33);
-    centerY -= sin(worldAngle) * (35/1.33) + cos(worldAngle) * (15/1.33);
-    worldAngle += QUARTER_PI;
-    break;
-
-  case '.':
-    centerX -= cos(worldAngle) * (56/1.33) - sin(worldAngle) * (-56/1.33);
-    centerY -= sin(worldAngle) * (56/1.33) + cos(worldAngle) * (-56/1.33);
-    worldAngle -= HALF_PI;
-    break;
-
-  case '!':
-    centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
-    centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
-    worldAngle -= QUARTER_PI;
-    break;
-
-  case '?':
-    centerX -= cos(worldAngle) * (42.5/1.33) - sin(worldAngle) * (-17.5/1.33);
-    centerY -= sin(worldAngle) * (42.5/1.33) + cos(worldAngle) * (-17.5/1.33);
-    worldAngle -= QUARTER_PI;
-    break;
-
-  case '\n': // return
-    worldAngle += PI;
-    centerY += cos(worldAngle) * (1/1.33) - sin(worldAngle) * (10/1.33);
-    centerY += sin(worldAngle) * (1/1.33) + cos(worldAngle) * (10/1.33);
-    break;
-
-  default: // all others
-    centerX += cos(worldAngle) * (-letterWidth/1.33) - sin(worldAngle) * 0;
-    centerY += sin(worldAngle) * (-letterWidth/1.33) + cos(worldAngle) * 0;
-  }
-
-// blink cursor after text
-if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
-console.log(worldAngle/PI, (-letterWidth/1.33),centerX, centerY);
+    offsetX = mouseX - centerX;
+    offsetY = mouseY - centerY;
 }
 
 function keyPressed() {
@@ -2067,6 +1946,8 @@ function keyPressed() {
   case DOWN_ARROW:
     zoom -= 0.05;
     break;
+  case ESCAPE:
+    pause = !pause;
   }
 }
 
