@@ -38,7 +38,7 @@ var zoom;
 
 var actRandomSeed;
 
-let preText2 = `Chapter 1
+let preText = `Chapter 1
 
 [1:1] In the beginning when God created the heavens and the earth,
 [1:2] the earth was a formless void and darkness covered the face of the deep, while a wind from God swept over the face of the waters.
@@ -1722,7 +1722,6 @@ Chapter 50
 [50:25] So Joseph made the Israelites swear, saying, "When God comes to you, you shall carry up my bones from here."
 [50:26] And Joseph died, being one hundred ten years old; he was embalmed and placed in a coffin in Egypt.`
 
-let preText = "DDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDDDDDDD.!DDDDDDDDD.DGHGGGG?\n\n???.....DDDD.D!.!!!..DDD"
 function preload() {
   font = loadFont('data/miso-bold.ttf');
   shapeSpace = loadImage('data/space.svg');
@@ -1777,7 +1776,6 @@ let worldAngle = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  //return;
   if (preText.length > 0) {
     textTyped += preText[0];
     preText = preText.slice(1);
@@ -1791,6 +1789,7 @@ function draw() {
   
   translate(centerX, centerY);
   scale(zoom);
+  let randomSpaceTracker = 0;
   
   for (var i = 0; i < textTyped.length; i++) {
     var letter = textTyped.charAt(i);
@@ -1802,11 +1801,13 @@ function draw() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));
       if (dir == 0) {
+        randomSpaceTracker = 0;
         image(shapeSpace, 1, -15);
         translate(4, 1);
         rotate(QUARTER_PI);
       }
       if (dir == 1) {
+        randomSpaceTracker = 1;
         image(shapeSpace2, 1, -15);
         translate(14, -5);
         rotate(-QUARTER_PI);
@@ -1849,30 +1850,30 @@ function draw() {
     }
   }
   
-  var letter = textTyped.charAt(textTyped.length-1);
+    var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
   
     // ------ letter rule table ------
     switch (letter) {
     case ' ': // space
       // 50% left, 50% right
-      var dir = floor(random(0, 2));
+      var dir = randomSpaceTracker;
       if (dir == 0) {
-        image(shapeSpace, 1, -15);
-        translate(4, 1);
-        rotate(QUARTER_PI);
+        centerX -= cos(worldAngle) * (4/1.33) - sin(worldAngle) * (1/1.33);
+        centerY -= sin(worldAngle) * (4/1.33) + cos(worldAngle) * (1/1.33);
+        worldAngle += QUARTER_PI;
       }
       if (dir == 1) {
-        image(shapeSpace2, 1, -15);
-        translate(14, -5);
-        rotate(-QUARTER_PI);
+        centerX -= cos(worldAngle) * (14/1.33) - sin(worldAngle) * (-5/1.33);
+        centerY -= sin(worldAngle) * (14/1.33) + cos(worldAngle) * (-5/1.33);
+        worldAngle -= QUARTER_PI;
       }
       break;
   
     case ',':
-      image(shapeComma, 1, -15);
-      translate(35, 15);
-      rotate(QUARTER_PI);
+      centerX -= cos(worldAngle) * (35/1.33) - sin(worldAngle) * (15/1.33);
+      centerY -= sin(worldAngle) * (35/1.33) + cos(worldAngle) * (15/1.33);
+      worldAngle += QUARTER_PI;
       break;
   
     case '.':
@@ -1927,6 +1928,7 @@ randomSeed(actRandomSeed);
 
 translate(centerX, centerY);
 scale(zoom);
+let randomSpaceTracker = 0;
 
 for (var i = 0; i < textTyped.length; i++) {
   var letter = textTyped.charAt(i);
@@ -1938,11 +1940,13 @@ for (var i = 0; i < textTyped.length; i++) {
     // 50% left, 50% right
     var dir = floor(random(0, 2));
     if (dir == 0) {
+      randomSpaceTracker = 0;
       image(shapeSpace, 1, -15);
       translate(4, 1);
       rotate(QUARTER_PI);
     }
     if (dir == 1) {
+      randomSpaceTracker = 1;
       image(shapeSpace2, 1, -15);
       translate(14, -5);
       rotate(-QUARTER_PI);
@@ -1985,30 +1989,30 @@ for (var i = 0; i < textTyped.length; i++) {
   }
 }
 
-var letter = textTyped.charAt(textTyped.length-1);
+  var letter = textTyped.charAt(textTyped.length-1);
   var letterWidth = textWidth(letter);
 
   // ------ letter rule table ------
   switch (letter) {
   case ' ': // space
     // 50% left, 50% right
-    var dir = floor(random(0, 2));
+    var dir = randomSpaceTracker;
     if (dir == 0) {
-      image(shapeSpace, 1, -15);
-      translate(4, 1);
-      rotate(QUARTER_PI);
+      centerX -= cos(worldAngle) * (4/1.33) - sin(worldAngle) * (1/1.33);
+      centerY -= sin(worldAngle) * (4/1.33) + cos(worldAngle) * (1/1.33);
+      worldAngle += QUARTER_PI;
     }
     if (dir == 1) {
-      image(shapeSpace2, 1, -15);
-      translate(14, -5);
-      rotate(-QUARTER_PI);
+      centerX -= cos(worldAngle) * (14/1.33) - sin(worldAngle) * (-5/1.33);
+      centerY -= sin(worldAngle) * (14/1.33) + cos(worldAngle) * (-5/1.33);
+      worldAngle -= QUARTER_PI;
     }
     break;
 
   case ',':
-    image(shapeComma, 1, -15);
-    translate(35, 15);
-    rotate(QUARTER_PI);
+    centerX -= cos(worldAngle) * (35/1.33) - sin(worldAngle) * (15/1.33);
+    centerY -= sin(worldAngle) * (35/1.33) + cos(worldAngle) * (15/1.33);
+    worldAngle += QUARTER_PI;
     break;
 
   case '.':
