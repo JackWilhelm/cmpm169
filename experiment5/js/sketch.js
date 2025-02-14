@@ -1759,6 +1759,8 @@ function setup() {
 
   centerX = width / 2;
   centerY = height / 2;
+  holdCenterX = centerX;
+  holdCenterY = centerY;
   offsetX = 0;
   offsetY = 0;
   zoom = 0.75;
@@ -1774,6 +1776,8 @@ function setup() {
 
 let worldAngle = 0;
 let pause = false;
+let holdCenterX = 0;
+let holdCenterY = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1947,6 +1951,13 @@ function keyPressed() {
     zoom -= 0.05;
     break;
   case ESCAPE:
+    if (!pause) {
+      holdCenterX = centerX;
+      holdCenterY = centerY;
+    } else {
+      centerX = holdCenterX;
+      centerY = holdCenterY;
+    }
     pause = !pause;
   }
 }
