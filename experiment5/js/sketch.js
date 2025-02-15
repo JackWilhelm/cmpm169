@@ -38,7 +38,7 @@ var zoom;
 
 var actRandomSeed;
 
-let preText = `Chapter 1
+let preText2 = `Chapter 1
 
 [1:1] In the beginning when God created the heavens and the earth,
 [1:2] the earth was a formless void and darkness covered the face of the deep, while a wind from God swept over the face of the waters.
@@ -1783,7 +1783,7 @@ let holdCenterX = 0;
 let holdCenterY = 0;
 let holdZoom = 0;
 let magicNumber = 1.33;
-let randomSpaceTracker = 0;
+let randomSpaceTracker = [];
 let softX = 0;
 let softY = 0;
 let userIndex = 0;
@@ -1807,7 +1807,7 @@ function draw() {
       lastUpdate = millis();
     }
   } else {
-    if (preText.length > 0) {
+    if (preText.length > positionInStory) {
       userIndex = textTyped.length;
       textTyped += preText[positionInStory]
       positionInStory++
@@ -1827,9 +1827,7 @@ function draw() {
   softY = lerp(softY, centerY, 0.05);
   translate(softX, softY);
   scale(zoom);
-  
-  randomSpaceTracker = 0;
-    
+      
   for (var i = 0; i < textTyped.length; i++) {
     if (i == userIndex) {
       fill("red");
@@ -1845,13 +1843,13 @@ function draw() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));
       if (dir == 0) {
-        randomSpaceTracker = 0;
+        randomSpaceTracker[textTyped.length-1] = 0;
         image(shapeSpace, 1, -15);
         translate(4, 1);
         rotate(QUARTER_PI);
       }
       if (dir == 1) {
-        randomSpaceTracker = 1;
+        randomSpaceTracker[textTyped.length-1] = 1;
         image(shapeSpace2, 1, -15);
         translate(14, -5);
         rotate(-QUARTER_PI);
@@ -1892,7 +1890,7 @@ function draw() {
     }
   }
   
-
+  console.log(randomSpaceTracker)
   if (!pause) {
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
@@ -1901,7 +1899,7 @@ function draw() {
     switch (letter) {
     case ' ': // space
       // 50% left, 50% right
-      var dir = randomSpaceTracker;
+      var dir = randomSpaceTracker[textTyped.length-1];
       if (dir == 0) {
         moveCenters(4,1);
         worldAngle += QUARTER_PI;
@@ -1973,7 +1971,6 @@ function keyPressed() {
     textTyped = textTyped.substring(0, userIndex) + textTyped.substring(userIndex+1);
     userIndex--;
     print(textTyped);
-    moveBack(textTyped[userIndex])
     break;
   case ENTER:
   case RETURN:
@@ -2013,7 +2010,10 @@ function keyTyped() {
   }
   if (keyCode >= 32) {
     //textTyped += key;
+    
     textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
+    repositionCamera(textTyped);
+    randomSpaceTracker.splice(userIndex-1,0,null);
     userIndex++
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
@@ -2024,14 +2024,14 @@ function keyTyped() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));;
       if (dir == 0) {
-        randomSpaceTracker = 0;
+        randomSpaceTracker.splice(userIndex-1,0,1);
         moveCenters(4,1);
         holdCenterX -= moveCenterX(4,1);
         holdCenterY -= moveCenterY(4,1);
         worldAngle += QUARTER_PI;
       }
       if (dir == 1) {
-        randomSpaceTracker = 0;
+        randomSpaceTracker.splice(userIndex-1,0,0);
         moveCenters(14,-5);
         holdCenterX -= moveCenterX(14,-5);
         holdCenterY -= moveCenterY(15,-5);
@@ -2086,5 +2086,61 @@ function keyTyped() {
     moveCenters(1,10);
     holdCenterX -= moveCenterX(1,10);
     holdCenterY -= moveCenterY(1,10);
+  }
+}
+
+let preText = "GGGG GGG GG G GGGG?G?? ?  GGGG GG GGGG G  GGG!,,DA ASDA \n  SSS S SSSSS  SSSSSSSSSSSSSSS SSSSSSSSSSSSSSSSSSSS"
+
+function repositionCamera(newString) {
+  centerX = width/2;
+  centerY = height/2;
+  worldAngle = 0;
+  for (var i = 0; i < newString.length; i++) {
+    var letter = textTyped.charAt(i);
+    var letterWidth = textWidth(letter);
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = randomSpaceTracker[i];
+      if (dir == 0) {
+        moveCenters(4,1);
+        worldAngle += QUARTER_PI;
+      }
+      if (dir == 1) {
+        moveCenters(14,-5);
+        worldAngle -= QUARTER_PI;
+      }
+      break;
+  
+    case ',':
+      moveCenters(35,15);
+      worldAngle += QUARTER_PI;
+      break;
+  
+    case '.':
+      moveCenters(56,-56);
+      worldAngle -= HALF_PI;
+      break;
+  
+    case '!':
+      moveCenters(42.5, -17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '?':
+      moveCenters(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '\n': // return
+      moveCenters(1,10);
+      worldAngle += PI;
+      break;
+  
+    default: // all others
+      moveCenters(letterWidth,0);
+    }
   }
 }
