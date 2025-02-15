@@ -1784,6 +1784,8 @@ let holdCenterY = 0;
 let holdZoom = 0;
 let magicNumber = 1.33;
 let randomSpaceTracker = 0;
+let softX = 0;
+let softY = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1808,8 +1810,9 @@ function draw() {
   // allways produce the same sequence of random numbers
   randomSeed(actRandomSeed);
   
-  
-  translate(centerX, centerY);
+  softX = lerp(softX, centerX, 0.05);
+  softY = lerp(softY, centerY, 0.05);
+  translate(softX, softY);
   scale(zoom);
   
   randomSpaceTracker = 0;
