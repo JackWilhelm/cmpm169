@@ -1768,7 +1768,7 @@ function setup() {
 
   frameRate(60);
 
-  actRandomSeed = new Date().getTime();
+  actRandomSeed = 6;
 
   cursor(HAND);
   textFont(font, 25);
@@ -1789,6 +1789,9 @@ let softY = 0;
 let userIndex = 0;
 let positionInStory = 0;
 
+let lastUpdate = 0;
+let delay = 50;
+
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
   if (pause) {
@@ -1796,19 +1799,23 @@ function draw() {
       centerX = mouseX - offsetX;
       centerY = mouseY - offsetY;
     }
+    if (keyIsDown(LEFT_ARROW) && millis() - lastUpdate > delay) {
+      userIndex--;
+      lastUpdate = millis();
+    } else if (keyIsDown(RIGHT_ARROW) && millis() - lastUpdate > delay) {
+      userIndex++;
+      lastUpdate = millis();
+    }
   } else {
     if (preText.length > 0) {
       userIndex = textTyped.length;
-      //textTyped += preText[0];
-      //preText = preText.slice(1);
       textTyped += preText[positionInStory]
       positionInStory++
     } else {
       return;
     }
   }
-  console.log(userIndex);
-  
+
   
 
   background(0);
@@ -1822,9 +1829,7 @@ function draw() {
   scale(zoom);
   
   randomSpaceTracker = 0;
-  
-  console.log(textTyped[userIndex])
-  
+    
   for (var i = 0; i < textTyped.length; i++) {
     if (i == userIndex) {
       fill("red");
@@ -1876,13 +1881,11 @@ function draw() {
       translate(42.5, -17.5);
       rotate(-QUARTER_PI);
       break;
-  
     case '\n': // return
       image(shapeReturn, 1, -15);
       translate(1, 10);
       rotate(PI);
       break;
-  
     default: // all others
       text(letter, 0, 0);
       translate(letterWidth, 0);
@@ -1967,15 +1970,15 @@ function keyPressed() {
   switch (keyCode) {
   case DELETE:
   case BACKSPACE:
-    //textTyped = textTyped.substring(0, max(0, textTyped.length - 1));
     textTyped = textTyped.substring(0, userIndex) + textTyped.substring(userIndex+1);
     userIndex--;
     print(textTyped);
+    moveBack(textTyped[userIndex])
     break;
   case ENTER:
   case RETURN:
     // enable linebreaks
-    textTyped += '\n';
+    textTyped = textTyped.substring(0, userIndex+1) + "\n" + textTyped.substring(userIndex+1)
     break;
   case UP_ARROW:
     if (pause) {
@@ -1999,16 +2002,8 @@ function keyPressed() {
     }
     pause = !pause;
     break;
-  case LEFT_ARROW:
-    if(pause) {
-      userIndex--;
-    }
-    break;
-  case RIGHT_ARROW:
-      if(pause) {
-        userIndex++;
-      }
-      break;
+  case 17:
+    userIndex = 0;
   }
 }
 
@@ -2020,7 +2015,6 @@ function keyTyped() {
     //textTyped += key;
     textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
     userIndex++
-    console.log(textTyped);
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
   
@@ -2044,7 +2038,6 @@ function keyTyped() {
         worldAngle -= QUARTER_PI;
       }
       break;
-  
     case ',':
       moveCenters(35,15);
       holdCenterX -= moveCenterX(35,15);
@@ -2088,6 +2081,7 @@ function keyTyped() {
     print(textTyped);
   }
   if(keyCode == 13) { //\n
+    userIndex++
     worldAngle -= PI;
     moveCenters(1,10);
     holdCenterX -= moveCenterX(1,10);
