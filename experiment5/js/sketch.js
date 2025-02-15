@@ -1774,7 +1774,7 @@ function setup() {
   textFont(font, 25);
   textAlign(LEFT, BASELINE);
   noStroke();
-  fill(0);
+  fill(255);
 }
 
 let worldAngle = 0;
@@ -1786,6 +1786,8 @@ let magicNumber = 1.33;
 let randomSpaceTracker = 0;
 let softX = 0;
 let softY = 0;
+let userIndex = 0;
+let positionInStory = 0;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1796,16 +1798,20 @@ function draw() {
     }
   } else {
     if (preText.length > 0) {
-      textTyped += preText[0];
-      preText = preText.slice(1);
+      userIndex = textTyped.length;
+      //textTyped += preText[0];
+      //preText = preText.slice(1);
+      textTyped += preText[positionInStory]
+      positionInStory++
     } else {
       return;
     }
   }
+  console.log(userIndex);
   
   
 
-  background(255);
+  background(0);
 
   // allways produce the same sequence of random numbers
   randomSeed(actRandomSeed);
@@ -1817,7 +1823,14 @@ function draw() {
   
   randomSpaceTracker = 0;
   
+  console.log(textTyped[userIndex])
+  
   for (var i = 0; i < textTyped.length; i++) {
+    if (i == userIndex) {
+      fill("red");
+    } else {
+      fill("white")
+    }
     var letter = textTyped.charAt(i);
     var letterWidth = textWidth(letter);
   
@@ -1954,7 +1967,9 @@ function keyPressed() {
   switch (keyCode) {
   case DELETE:
   case BACKSPACE:
-    textTyped = textTyped.substring(0, max(0, textTyped.length - 1));
+    //textTyped = textTyped.substring(0, max(0, textTyped.length - 1));
+    textTyped = textTyped.substring(0, userIndex) + textTyped.substring(userIndex+1);
+    userIndex--;
     print(textTyped);
     break;
   case ENTER:
@@ -1983,6 +1998,17 @@ function keyPressed() {
       zoom = holdZoom;
     }
     pause = !pause;
+    break;
+  case LEFT_ARROW:
+    if(pause) {
+      userIndex--;
+    }
+    break;
+  case RIGHT_ARROW:
+      if(pause) {
+        userIndex++;
+      }
+      break;
   }
 }
 
@@ -1991,7 +2017,10 @@ function keyTyped() {
     return;
   }
   if (keyCode >= 32) {
-    textTyped += key;
+    //textTyped += key;
+    textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
+    userIndex++
+    console.log(textTyped);
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
   
