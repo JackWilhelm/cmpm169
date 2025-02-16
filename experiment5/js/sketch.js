@@ -120,7 +120,7 @@ let pathWidth = 0;
 let pathHeight = 0;
 let mmX = 0;
 let mmY = 0;
-let maxTrailLength = 300000;
+let maxTrailLength = 1000;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -364,10 +364,12 @@ function keyPressed() {
       holdCenterX = centerX;
       holdCenterY = centerY;
       holdZoom = zoom;
+      maxTrailLength = 300000;
     } else {
       centerX = holdCenterX;
       centerY = holdCenterY;
       zoom = holdZoom;
+      maxTrailLength = 1000;
     }
     offsetX = 0;
     offsetY = 0;

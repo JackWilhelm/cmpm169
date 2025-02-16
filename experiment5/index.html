@@ -32,7 +32,7 @@
 	<main id="content">
 		<section>
 
-			<h1>Experiment 4 - Scatterbrain</h1>
+			<h1>Experiment 5 - What if Mario Made the Universe?</h1>
 
 			<div class="minor-section">
 				<div id="canvas-container">
@@ -45,24 +45,32 @@
 
 			<div class="minor-section">
 				<h2>Description</h2>
-				<p>Watch the inner macinations of this figures mind.</p>
-				<p>R = Reset grid</p>
-				<p>Q = Flip through fill modes</p>
-				<p>E = Flip through stroke modes</p>
+				<p>Watch the Book of Genesis play out before you eyes. Edit the story and see how it changes the path of the beginning of time.</p>
+				<p>ESC - pause/unpause</p>
+				<p>How to use find and replace - enter the word/phrase/characters you want to swap out in the upper text box. Enter the what you want them to be
+					replaced with in the lower textbox. Press F2. Press ESC, the ESC again to see your results. For example you can swap out every instance of the word God with Mario.
+				</p>
+				<p>While paused:</p>
+				<p>Type - Inserts text into the story whwever the index is.</p>
+				<p>Left and right arrows - move index left and right.</p>
+				<p>Left ctrl - put index at start of story.</p>
+				<p>up and down arrow - zoom in and out</p>
+				<p>click and drag - move around canvas</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Based on the size of the canvas, a 3D array is created representing different coordinates. Then an array representing a path attempts to walk as far as possible without running
-					into itself by checking all possible neighbors. If there are no options, then the path ends. Each frame, this path is reconstructed using cubes and lines. As this path is being drawn out
-					the path the starting value of the path is also being shifted out to make the path appear to be shrinking. 
+				<p>Every frame a character from the Book of Genesis is added onto another string called textTyped. This text is then printed out accordingly. Punctuation and spaces are displayed as twists
+					and turns and moves the canvas accordingly to keep the progress centered. Only the previous 1000 charcters are printed in unpause mode to be more efficient. Pauseing and editing the text will recalculate the twists and turns 
+					to display an new path. 
 				</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Jack Wilhelm - This project was a lot more difficult especially when finding something to base it off of. I'm slowly becoming the Jackson Pollock of random walks as I continue to find 
-					there behaviors interestings. This project took a lot of effort when wrapping my head around thinking of a 3D dimension on a 2D canvas but I eventually got the job done.
+				<p>Jack Wilhelm - A lot of math and trial and error went into this project making it very exhausting but fun to watch. Still staying one of the hardest parts was keeping track of the spaces because spaces are a 50/50 chance to turn left or right
+					and thus when recalculating all of those turns have to be properly tracked so the path properlly recreates itself as thought those changes had always existed. I think the concept of tracking the Christian origin story as the beginning of time and see how things could be changed 
+					is an interesting butterfly effect view of the creation of the world and man.
 				</p>
 			</div>
 
