@@ -1766,7 +1766,7 @@ function setup() {
   zoom = 0.75;
   holdZoom = zoom;
 
-  frameRate(60);
+  frameRate(120);
 
   actRandomSeed = 6;
 
@@ -1775,6 +1775,10 @@ function setup() {
   textAlign(LEFT, BASELINE);
   noStroke();
   fill(255);
+  swapOutInput = createInput('');
+  swapOutInput.position(canvasContainer.width()/2,  canvasContainer.height());
+  swapInInput = createInput('');
+  swapInInput.position(canvasContainer.width()/2,  canvasContainer.height() + 30);
 }
 
 let worldAngle = 0;
@@ -1786,11 +1790,14 @@ let magicNumber = 1.33;
 let randomSpaceTracker = [];
 let softX = 0;
 let softY = 0;
+let softZoom = 0;
 let userIndex = 0;
 let positionInStory = 0;
 
 let lastUpdate = 0;
 let delay = 50;
+let swapOutInput;
+let swapInInput;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -1825,8 +1832,11 @@ function draw() {
   
   softX = lerp(softX, centerX, 0.05);
   softY = lerp(softY, centerY, 0.05);
+  softZoom = lerp(softZoom, zoom, 0.05);
   translate(softX, softY);
-  scale(zoom);
+  scale(softZoom);
+  
+  
       
   for (var i = 0; i < textTyped.length; i++) {
     if (i == userIndex) {
@@ -1890,7 +1900,6 @@ function draw() {
       translate(letterWidth, 0);
     }
   }
-  console.log(randomSpaceTracker)
   
   
   if (!pause) {
@@ -2001,8 +2010,16 @@ function keyPressed() {
     }
     pause = !pause;
     break;
-  case 17:
+  case 17: //L CTRL
     userIndex = 0;
+    break;
+  case 113: //F2
+    if (!pause) {
+      preText = preText.replaceAll(swapOutInput.value(), swapInInput.value());
+      textTyped = textTyped.replaceAll(swapOutInput.value(), swapInInput.value());
+      pause = !pause;
+    }
+    break;
   }
   repositionCamera(textTyped);
 
@@ -2026,14 +2043,12 @@ function keyTyped() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));;
       if (dir == 0) {
-        //randomSpaceTracker.splice(userIndex,0,dir);
         moveCenters(4,1);
         holdCenterX -= moveCenterX(4,1);
         holdCenterY -= moveCenterY(4,1);
         worldAngle += QUARTER_PI;
       }
       if (dir == 1) {
-        //randomSpaceTracker.splice(userIndex,0,dir);
         moveCenters(14,-5);
         holdCenterX -= moveCenterX(14,-5);
         holdCenterY -= moveCenterY(14,-5);
@@ -2104,9 +2119,6 @@ function repositionCamera(newString) {
     case ' ': // space
       // 50% left, 50% right
       var dir = randomSpaceTracker[i];
-      if(dir == null) {
-        console.log("help", i, randomSpaceTracker)
-      }
       if (dir == 0) {
         moveCenters(4,1);
         worldAngle += QUARTER_PI;
