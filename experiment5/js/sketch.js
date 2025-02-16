@@ -38,7 +38,7 @@ var zoom;
 
 var actRandomSeed;
 
-let preText2 = `Chapter 1
+let preText = `Chapter 1
 
 [1:1] In the beginning when God created the heavens and the earth,
 [1:2] the earth was a formless void and darkness covered the face of the deep, while a wind from God swept over the face of the waters.
@@ -1836,6 +1836,7 @@ function draw() {
     }
     var letter = textTyped.charAt(i);
     var letterWidth = textWidth(letter);
+    randomSpaceTracker[i] = null;
   
     // ------ letter rule table ------
     switch (letter) {
@@ -1843,13 +1844,13 @@ function draw() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));
       if (dir == 0) {
-        randomSpaceTracker[textTyped.length-1] = 0;
+        randomSpaceTracker[i] = dir;
         image(shapeSpace, 1, -15);
         translate(4, 1);
         rotate(QUARTER_PI);
       }
       if (dir == 1) {
-        randomSpaceTracker[textTyped.length-1] = 1;
+        randomSpaceTracker[i] = dir;
         image(shapeSpace2, 1, -15);
         translate(14, -5);
         rotate(-QUARTER_PI);
@@ -1889,8 +1890,9 @@ function draw() {
       translate(letterWidth, 0);
     }
   }
-  
   console.log(randomSpaceTracker)
+  
+  
   if (!pause) {
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
@@ -2002,6 +2004,8 @@ function keyPressed() {
   case 17:
     userIndex = 0;
   }
+  repositionCamera(textTyped);
+
 }
 
 function keyTyped() {
@@ -2012,8 +2016,6 @@ function keyTyped() {
     //textTyped += key;
     
     textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
-    repositionCamera(textTyped);
-    randomSpaceTracker.splice(userIndex-1,0,null);
     userIndex++
     var letter = textTyped.charAt(textTyped.length-1);
     var letterWidth = textWidth(letter);
@@ -2024,17 +2026,17 @@ function keyTyped() {
       // 50% left, 50% right
       var dir = floor(random(0, 2));;
       if (dir == 0) {
-        randomSpaceTracker.splice(userIndex-1,0,1);
+        //randomSpaceTracker.splice(userIndex,0,dir);
         moveCenters(4,1);
         holdCenterX -= moveCenterX(4,1);
         holdCenterY -= moveCenterY(4,1);
         worldAngle += QUARTER_PI;
       }
       if (dir == 1) {
-        randomSpaceTracker.splice(userIndex-1,0,0);
+        //randomSpaceTracker.splice(userIndex,0,dir);
         moveCenters(14,-5);
         holdCenterX -= moveCenterX(14,-5);
-        holdCenterY -= moveCenterY(15,-5);
+        holdCenterY -= moveCenterY(14,-5);
         worldAngle -= QUARTER_PI;
       }
       break;
@@ -2089,8 +2091,6 @@ function keyTyped() {
   }
 }
 
-let preText = "GGGG GGG GG G GGGG?G?? ?  GGGG GG GGGG G  GGG!,,DA ASDA \n  SSS S SSSSS  SSSSSSSSSSSSSSS SSSSSSSSSSSSSSSSSSSS"
-
 function repositionCamera(newString) {
   centerX = width/2;
   centerY = height/2;
@@ -2104,6 +2104,9 @@ function repositionCamera(newString) {
     case ' ': // space
       // 50% left, 50% right
       var dir = randomSpaceTracker[i];
+      if(dir == null) {
+        console.log("help", i, randomSpaceTracker)
+      }
       if (dir == 0) {
         moveCenters(4,1);
         worldAngle += QUARTER_PI;
