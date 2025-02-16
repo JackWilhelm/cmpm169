@@ -120,7 +120,7 @@ let pathWidth = 0;
 let pathHeight = 0;
 let mmX = 0;
 let mmY = 0;
-let maxTrailLength = 500;
+let maxTrailLength = 300000;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -252,6 +252,8 @@ function draw() {
       }
       translate(letterWidth, 0);
     }
+    
+
   }
   
   
@@ -302,6 +304,7 @@ function draw() {
     default: // all others
       moveCenters(letterWidth,0);
     }
+    
   }
   
   // blink cursor after text
@@ -380,6 +383,7 @@ function keyPressed() {
       preText = preText.replaceAll(swapOutInput.value(), swapInInput.value());
       textTyped = textTyped.replaceAll(swapOutInput.value(), swapInInput.value());
       pause = !pause;
+      repoCam = true;
     }
     break;
   }
