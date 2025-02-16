@@ -296,6 +296,14 @@ function draw() {
   if (softY > pathHeight) {
     pathHeight = softY;
   }
+
+  console.log(repoCam);
+  if (repoCam && !pause) {
+    repoCam = false;
+    softX = width/2;
+    softY = height/2;
+    repositionCamera(textTyped);
+  }
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
@@ -358,9 +366,9 @@ function keyPressed() {
     }
     break;
   }
-  repositionCamera(textTyped);
-
 }
+
+let repoCam = false;
 
 function keyTyped() {
   if (!pause) {
@@ -444,6 +452,7 @@ function keyTyped() {
     holdCenterX -= moveCenterX(1,10);
     holdCenterY -= moveCenterY(1,10);
   }
+  repoCam = true;
 }
 
 function repositionCamera(newString) {
