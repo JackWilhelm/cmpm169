@@ -163,9 +163,6 @@ function draw() {
   softY = lerp(softY, centerY, 0.05);
   softZoom = lerp(softZoom, zoom, 0.05);
   
-  
-  console.log(centerX,centerY);
-  
   if(pause) {
     translate(pathWidth/2, pathHeight/2);
     translate(mmX, mmY);
@@ -367,6 +364,9 @@ function keyPressed() {
 
 function keyTyped() {
   if (!pause) {
+    return;
+  }
+  if (swapInInput.elt == document.activeElement || swapOutInput.elt == document.activeElement) {
     return;
   }
   if (keyCode >= 32) {
