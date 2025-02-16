@@ -120,6 +120,7 @@ let pathWidth = 0;
 let pathHeight = 0;
 let mmX = 0;
 let mmY = 0;
+let maxTrailLength = 500;
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -191,48 +192,64 @@ function draw() {
       var dir = floor(random(0, 2));
       if (dir == 0) {
         randomSpaceTracker[i] = dir;
-        image(shapeSpace, 1, -15);
+        if (i > textTyped.length - maxTrailLength) {
+          image(shapeSpace, 1, -15);
+        }
         translate(4, 1);
         rotate(QUARTER_PI);
       }
       if (dir == 1) {
+        if (i > textTyped.length - maxTrailLength) {
+          image(shapeSpace2, 1, -15);
+        }
         randomSpaceTracker[i] = dir;
-        image(shapeSpace2, 1, -15);
         translate(14, -5);
         rotate(-QUARTER_PI);
       }
       break;
   
     case ',':
-      image(shapeComma, 1, -15);
+      if (i > textTyped.length - maxTrailLength) {
+        image(shapeComma, 1, -15);
+      }
       translate(35, 15);
       rotate(QUARTER_PI);
       break;
   
     case '.':
-      image(shapePeriod, 1, -55);
+      if (i > textTyped.length - maxTrailLength) {
+        image(shapePeriod, 1, -55);
+      }
       translate(56, -56);
       rotate(-HALF_PI);
       break;
   
     case '!':
-      image(shapeExclamationmark, 1, -27);
+      if (i > textTyped.length - maxTrailLength) {
+        image(shapeExclamationmark, 1, -27);
+      }
       translate(42.5, -17.5);
       rotate(-QUARTER_PI);
       break;
   
     case '?':
-      image(shapeQuestionmark, 1, -27);
+      if (i > textTyped.length - maxTrailLength) {
+        image(shapeQuestionmark, 1, -27);
+      }
       translate(42.5, -17.5);
       rotate(-QUARTER_PI);
       break;
     case '\n': // return
-      image(shapeReturn, 1, -15);
+      if (i > textTyped.length - maxTrailLength) {
+        image(shapeReturn, 1, -15);
+      }
       translate(1, 10);
       rotate(PI);
       break;
     default: // all others
-      text(letter, 0, 0);
+      if (i > textTyped.length - maxTrailLength) {
+        text(letter, 0, 0);
+      }
       translate(letterWidth, 0);
     }
   }
