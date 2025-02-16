@@ -38,6 +38,468 @@ var zoom;
 
 var actRandomSeed;
 
+
+function preload() {
+  font = loadFont('data/miso-bold.ttf');
+  shapeSpace = loadImage('data/space.svg');
+  shapeSpace2 = loadImage('data/space2.svg');
+  shapePeriod = loadImage('data/period.svg');
+  shapeComma = loadImage('data/comma.svg');
+  shapeExclamationmark = loadImage('data/exclamationmark.svg');
+  shapeQuestionmark = loadImage('data/questionmark.svg');
+  shapeReturn = loadImage('data/return.svg');
+}
+
+function resizeScreen() {
+  centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
+  centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
+  console.log("Resizing...");
+  resizeCanvas(canvasContainer.width(), canvasContainer.height());
+  // redrawCanvas(); // Redraw everything based on new size
+}
+
+// setup() function is called once when the program starts
+function setup() {
+  // place our canvas, making it fit our container
+  canvasContainer = $("#canvas-container");
+  let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
+  canvas.parent("canvas-container");
+  // resize canvas is the page is resized
+
+  // create an instance of the class
+  myInstance = new MyClass("VALUE1", "VALUE2");
+
+  $(window).resize(function() {
+    resizeScreen();
+  });
+  resizeScreen();
+
+  centerX = width / 2;
+  centerY = height / 2;
+  holdCenterX = centerX;
+  holdCenterY = centerY;
+  offsetX = 0;
+  offsetY = 0;
+  zoom = 0.75;
+  holdZoom = zoom;
+
+  frameRate(120);
+
+  actRandomSeed = 6;
+
+  cursor(HAND);
+  textFont(font, 25);
+  textAlign(LEFT, BASELINE);
+  noStroke();
+  fill(255);
+  swapOutInput = createInput('');
+  swapOutInput.position(canvasContainer.width()/2,  canvasContainer.height());
+  swapInInput = createInput('');
+  swapInInput.position(canvasContainer.width()/2,  canvasContainer.height() + 30);
+}
+
+let worldAngle = 0;
+let pause = false;
+let holdCenterX = 0;
+let holdCenterY = 0;
+let holdZoom = 0;
+let magicNumber = 1.33;
+let randomSpaceTracker = [];
+let softX = 0;
+let softY = 0;
+let softZoom = 0;
+let userIndex = 0;
+let positionInStory = 0;
+
+let lastUpdate = 0;
+let delay = 50;
+let swapOutInput;
+let swapInInput;
+
+let pathWidth = 0;
+let pathHeight = 0;
+let mmX = 0;
+let mmY = 0;
+
+// draw() function is called repeatedly, it's the main animation loop
+function draw() {
+  if (pause) {
+    if (mouseIsPressed && mouseButton == LEFT) {
+      mmX = mouseX - offsetX;
+      mmY = mouseY - offsetY;
+    }
+    if (keyIsDown(LEFT_ARROW) && millis() - lastUpdate > delay) {
+      userIndex--;
+      lastUpdate = millis();
+    } else if (keyIsDown(RIGHT_ARROW) && millis() - lastUpdate > delay) {
+      userIndex++;
+      lastUpdate = millis();
+    }
+    if (keyIsDown(DOWN_ARROW) && millis() - lastUpdate > delay && pause) {
+      zoom -= 0.05;
+      lastUpdate = millis();
+    } else if (keyIsDown(UP_ARROW) && millis() - lastUpdate > delay && pause) {
+      zoom += 0.01;
+      lastUpdate = millis();
+    }
+  } else {
+    if (preText.length > positionInStory) {
+      userIndex = textTyped.length;
+      textTyped += preText[positionInStory]
+      positionInStory++
+    } else {
+      return;
+    }
+  }
+
+  
+
+  background(0);
+
+  // allways produce the same sequence of random numbers
+  randomSeed(actRandomSeed);
+  
+  softX = lerp(softX, centerX, 0.05);
+  softY = lerp(softY, centerY, 0.05);
+  softZoom = lerp(softZoom, zoom, 0.05);
+  
+  
+  console.log(centerX,centerY);
+  
+  if(pause) {
+    translate(pathWidth/2, pathHeight/2);
+    translate(mmX, mmY);
+  } else {
+    translate(softX, softY);
+  }
+  
+  
+  scale(softZoom); 
+  
+      
+  for (var i = 0; i < textTyped.length; i++) {
+    if (i == userIndex) {
+      fill("red");
+    } else {
+      fill("white")
+    }
+    var letter = textTyped.charAt(i);
+    var letterWidth = textWidth(letter);
+    randomSpaceTracker[i] = null;
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = floor(random(0, 2));
+      if (dir == 0) {
+        randomSpaceTracker[i] = dir;
+        image(shapeSpace, 1, -15);
+        translate(4, 1);
+        rotate(QUARTER_PI);
+      }
+      if (dir == 1) {
+        randomSpaceTracker[i] = dir;
+        image(shapeSpace2, 1, -15);
+        translate(14, -5);
+        rotate(-QUARTER_PI);
+      }
+      break;
+  
+    case ',':
+      image(shapeComma, 1, -15);
+      translate(35, 15);
+      rotate(QUARTER_PI);
+      break;
+  
+    case '.':
+      image(shapePeriod, 1, -55);
+      translate(56, -56);
+      rotate(-HALF_PI);
+      break;
+  
+    case '!':
+      image(shapeExclamationmark, 1, -27);
+      translate(42.5, -17.5);
+      rotate(-QUARTER_PI);
+      break;
+  
+    case '?':
+      image(shapeQuestionmark, 1, -27);
+      translate(42.5, -17.5);
+      rotate(-QUARTER_PI);
+      break;
+    case '\n': // return
+      image(shapeReturn, 1, -15);
+      translate(1, 10);
+      rotate(PI);
+      break;
+    default: // all others
+      text(letter, 0, 0);
+      translate(letterWidth, 0);
+    }
+  }
+  
+  
+  if (!pause) {
+    var letter = textTyped.charAt(textTyped.length-1);
+    var letterWidth = textWidth(letter);
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = randomSpaceTracker[textTyped.length-1];
+      if (dir == 0) {
+        moveCenters(4,1);
+        worldAngle += QUARTER_PI;
+      }
+      if (dir == 1) {
+        moveCenters(14,-5);
+        worldAngle -= QUARTER_PI;
+      }
+      break;
+  
+    case ',':
+      moveCenters(35,15);
+      worldAngle += QUARTER_PI;
+      break;
+  
+    case '.':
+      moveCenters(56,-56);
+      worldAngle -= HALF_PI;
+      break;
+  
+    case '!':
+      moveCenters(42.5, -17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '?':
+      moveCenters(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '\n': // return
+      moveCenters(1,10);
+      worldAngle += PI;
+      break;
+  
+    default: // all others
+      moveCenters(letterWidth,0);
+    }
+  }
+  
+  // blink cursor after text
+  if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
+
+  if (softX > pathWidth) {
+    pathWidth = softX;
+  }
+  if (softY > pathHeight) {
+    pathHeight = softY;
+  }
+}
+
+// mousePressed() function is called once after every time a mouse button is pressed
+function mousePressed() {
+    // code to run when mouse is pressed
+    offsetX = mouseX - mmX;
+    offsetY = mouseY - mmY;
+}
+
+function moveCenters(dx, dy) {
+  centerX -= moveCenterX(dx, dy);
+  centerY -= moveCenterY(dx, dy);
+}
+
+function moveCenterX(dx, dy){
+  return cos(worldAngle) * (dx/magicNumber) - sin(worldAngle) * (dy/magicNumber);
+}
+
+function moveCenterY(dx, dy){
+  return sin(worldAngle) * (dx/magicNumber) + cos(worldAngle) * (dy/magicNumber);
+}
+
+function keyPressed() {
+  switch (keyCode) {
+  case DELETE:
+  case BACKSPACE:
+    textTyped = textTyped.substring(0, userIndex) + textTyped.substring(userIndex+1);
+    userIndex--;
+    print(textTyped);
+    break;
+  case ENTER:
+  case RETURN:
+    // enable linebreaks
+    textTyped = textTyped.substring(0, userIndex+1) + "\n" + textTyped.substring(userIndex+1)
+    break;
+  case ESCAPE:
+    if (!pause) {
+      holdCenterX = centerX;
+      holdCenterY = centerY;
+      holdZoom = zoom;
+    } else {
+      centerX = holdCenterX;
+      centerY = holdCenterY;
+      zoom = holdZoom;
+    }
+    offsetX = 0;
+    offsetY = 0;
+    mmX = 0;
+    mmY = 0;
+    pause = !pause;
+    break;
+  case 17: //L CTRL
+    userIndex = 0;
+    break;
+  case 113: //F2
+    if (!pause) {
+      preText = preText.replaceAll(swapOutInput.value(), swapInInput.value());
+      textTyped = textTyped.replaceAll(swapOutInput.value(), swapInInput.value());
+      pause = !pause;
+    }
+    break;
+  }
+  repositionCamera(textTyped);
+
+}
+
+function keyTyped() {
+  if (!pause) {
+    return;
+  }
+  if (keyCode >= 32) {
+    //textTyped += key;
+    
+    textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
+    userIndex++
+    var letter = textTyped.charAt(textTyped.length-1);
+    var letterWidth = textWidth(letter);
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = floor(random(0, 2));;
+      if (dir == 0) {
+        moveCenters(4,1);
+        holdCenterX -= moveCenterX(4,1);
+        holdCenterY -= moveCenterY(4,1);
+        worldAngle += QUARTER_PI;
+      }
+      if (dir == 1) {
+        moveCenters(14,-5);
+        holdCenterX -= moveCenterX(14,-5);
+        holdCenterY -= moveCenterY(14,-5);
+        worldAngle -= QUARTER_PI;
+      }
+      break;
+    case ',':
+      moveCenters(35,15);
+      holdCenterX -= moveCenterX(35,15);
+      holdCenterY -= moveCenterY(35,15);
+      worldAngle += QUARTER_PI;
+      break;
+  
+    case '.':
+      moveCenters(56,-56);
+      holdCenterX -= moveCenterX(56,-56);
+      holdCenterY -= moveCenterY(56,-56);
+      worldAngle -= HALF_PI;
+      break;
+  
+    case '!':
+      moveCenters(42.5, -17.5);
+      holdCenterX -= moveCenterX(42.5,-17.5);
+      holdCenterY -= moveCenterY(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '?':
+      moveCenters(42.5,-17.5);
+      holdCenterX -= moveCenterX(42.5,-17.5);
+      holdCenterY -= moveCenterY(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '\n': // return
+      worldAngle -= PI;
+      moveCenters(1,10);
+      holdCenterX -= moveCenterX(1,10);
+      holdCenterY -= moveCenterY(1,10);
+      break;
+  
+    default: // all others
+      moveCenters(letterWidth,0);
+      holdCenterX -= moveCenterX(letterWidth,0);
+      holdCenterY -= moveCenterY(letterWidth,0);
+    }
+    print(textTyped);
+  }
+  if(keyCode == 13) { //\n
+    userIndex++
+    worldAngle -= PI;
+    moveCenters(1,10);
+    holdCenterX -= moveCenterX(1,10);
+    holdCenterY -= moveCenterY(1,10);
+  }
+}
+
+function repositionCamera(newString) {
+  centerX = width/2;
+  centerY = height/2;
+  worldAngle = 0;
+  for (var i = 0; i < newString.length; i++) {
+    var letter = textTyped.charAt(i);
+    var letterWidth = textWidth(letter);
+  
+    // ------ letter rule table ------
+    switch (letter) {
+    case ' ': // space
+      // 50% left, 50% right
+      var dir = randomSpaceTracker[i];
+      if (dir == 0) {
+        moveCenters(4,1);
+        worldAngle += QUARTER_PI;
+      }
+      if (dir == 1) {
+        moveCenters(14,-5);
+        worldAngle -= QUARTER_PI;
+      }
+      break;
+  
+    case ',':
+      moveCenters(35,15);
+      worldAngle += QUARTER_PI;
+      break;
+  
+    case '.':
+      moveCenters(56,-56);
+      worldAngle -= HALF_PI;
+      break;
+  
+    case '!':
+      moveCenters(42.5, -17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '?':
+      moveCenters(42.5,-17.5);
+      worldAngle -= QUARTER_PI;
+      break;
+  
+    case '\n': // return
+      moveCenters(1,10);
+      worldAngle += PI;
+      break;
+  
+    default: // all others
+      moveCenters(letterWidth,0);
+    }
+  }
+}
+
 let preText = `Chapter 1
 
 [1:1] In the beginning when God created the heavens and the earth,
@@ -1721,441 +2183,3 @@ Chapter 50
 [50:24] Then Joseph said to his brothers, "I am about to die; but God will surely come to you, and bring you up out of this land to the land that he swore to Abraham, to Isaac, and to Jacob."
 [50:25] So Joseph made the Israelites swear, saying, "When God comes to you, you shall carry up my bones from here."
 [50:26] And Joseph died, being one hundred ten years old; he was embalmed and placed in a coffin in Egypt.`
-
-function preload() {
-  font = loadFont('data/miso-bold.ttf');
-  shapeSpace = loadImage('data/space.svg');
-  shapeSpace2 = loadImage('data/space2.svg');
-  shapePeriod = loadImage('data/period.svg');
-  shapeComma = loadImage('data/comma.svg');
-  shapeExclamationmark = loadImage('data/exclamationmark.svg');
-  shapeQuestionmark = loadImage('data/questionmark.svg');
-  shapeReturn = loadImage('data/return.svg');
-}
-
-function resizeScreen() {
-  centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
-  centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
-  console.log("Resizing...");
-  resizeCanvas(canvasContainer.width(), canvasContainer.height());
-  // redrawCanvas(); // Redraw everything based on new size
-}
-
-// setup() function is called once when the program starts
-function setup() {
-  // place our canvas, making it fit our container
-  canvasContainer = $("#canvas-container");
-  let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-  canvas.parent("canvas-container");
-  // resize canvas is the page is resized
-
-  // create an instance of the class
-  myInstance = new MyClass("VALUE1", "VALUE2");
-
-  $(window).resize(function() {
-    resizeScreen();
-  });
-  resizeScreen();
-
-  centerX = width / 2;
-  centerY = height / 2;
-  holdCenterX = centerX;
-  holdCenterY = centerY;
-  offsetX = 0;
-  offsetY = 0;
-  zoom = 0.75;
-  holdZoom = zoom;
-
-  frameRate(120);
-
-  actRandomSeed = 6;
-
-  cursor(HAND);
-  textFont(font, 25);
-  textAlign(LEFT, BASELINE);
-  noStroke();
-  fill(255);
-  swapOutInput = createInput('');
-  swapOutInput.position(canvasContainer.width()/2,  canvasContainer.height());
-  swapInInput = createInput('');
-  swapInInput.position(canvasContainer.width()/2,  canvasContainer.height() + 30);
-}
-
-let worldAngle = 0;
-let pause = false;
-let holdCenterX = 0;
-let holdCenterY = 0;
-let holdZoom = 0;
-let magicNumber = 1.33;
-let randomSpaceTracker = [];
-let softX = 0;
-let softY = 0;
-let softZoom = 0;
-let userIndex = 0;
-let positionInStory = 0;
-
-let lastUpdate = 0;
-let delay = 50;
-let swapOutInput;
-let swapInInput;
-
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-  if (pause) {
-    if (mouseIsPressed && mouseButton == LEFT) {
-      centerX = mouseX - offsetX;
-      centerY = mouseY - offsetY;
-    }
-    if (keyIsDown(LEFT_ARROW) && millis() - lastUpdate > delay) {
-      userIndex--;
-      lastUpdate = millis();
-    } else if (keyIsDown(RIGHT_ARROW) && millis() - lastUpdate > delay) {
-      userIndex++;
-      lastUpdate = millis();
-    }
-  } else {
-    if (preText.length > positionInStory) {
-      userIndex = textTyped.length;
-      textTyped += preText[positionInStory]
-      positionInStory++
-    } else {
-      return;
-    }
-  }
-
-  
-
-  background(0);
-
-  // allways produce the same sequence of random numbers
-  randomSeed(actRandomSeed);
-  
-  softX = lerp(softX, centerX, 0.05);
-  softY = lerp(softY, centerY, 0.05);
-  softZoom = lerp(softZoom, zoom, 0.05);
-  translate(softX, softY);
-  scale(softZoom);
-  
-  
-      
-  for (var i = 0; i < textTyped.length; i++) {
-    if (i == userIndex) {
-      fill("red");
-    } else {
-      fill("white")
-    }
-    var letter = textTyped.charAt(i);
-    var letterWidth = textWidth(letter);
-    randomSpaceTracker[i] = null;
-  
-    // ------ letter rule table ------
-    switch (letter) {
-    case ' ': // space
-      // 50% left, 50% right
-      var dir = floor(random(0, 2));
-      if (dir == 0) {
-        randomSpaceTracker[i] = dir;
-        image(shapeSpace, 1, -15);
-        translate(4, 1);
-        rotate(QUARTER_PI);
-      }
-      if (dir == 1) {
-        randomSpaceTracker[i] = dir;
-        image(shapeSpace2, 1, -15);
-        translate(14, -5);
-        rotate(-QUARTER_PI);
-      }
-      break;
-  
-    case ',':
-      image(shapeComma, 1, -15);
-      translate(35, 15);
-      rotate(QUARTER_PI);
-      break;
-  
-    case '.':
-      image(shapePeriod, 1, -55);
-      translate(56, -56);
-      rotate(-HALF_PI);
-      break;
-  
-    case '!':
-      image(shapeExclamationmark, 1, -27);
-      translate(42.5, -17.5);
-      rotate(-QUARTER_PI);
-      break;
-  
-    case '?':
-      image(shapeQuestionmark, 1, -27);
-      translate(42.5, -17.5);
-      rotate(-QUARTER_PI);
-      break;
-    case '\n': // return
-      image(shapeReturn, 1, -15);
-      translate(1, 10);
-      rotate(PI);
-      break;
-    default: // all others
-      text(letter, 0, 0);
-      translate(letterWidth, 0);
-    }
-  }
-  
-  
-  if (!pause) {
-    var letter = textTyped.charAt(textTyped.length-1);
-    var letterWidth = textWidth(letter);
-  
-    // ------ letter rule table ------
-    switch (letter) {
-    case ' ': // space
-      // 50% left, 50% right
-      var dir = randomSpaceTracker[textTyped.length-1];
-      if (dir == 0) {
-        moveCenters(4,1);
-        worldAngle += QUARTER_PI;
-      }
-      if (dir == 1) {
-        moveCenters(14,-5);
-        worldAngle -= QUARTER_PI;
-      }
-      break;
-  
-    case ',':
-      moveCenters(35,15);
-      worldAngle += QUARTER_PI;
-      break;
-  
-    case '.':
-      moveCenters(56,-56);
-      worldAngle -= HALF_PI;
-      break;
-  
-    case '!':
-      moveCenters(42.5, -17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '?':
-      moveCenters(42.5,-17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '\n': // return
-      moveCenters(1,10);
-      worldAngle += PI;
-      break;
-  
-    default: // all others
-      moveCenters(letterWidth,0);
-    }
-  }
-  
-  // blink cursor after text
-  if (frameCount / 6 % 2 == 0) rect(0, 0, 15, 2);
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
-    offsetX = mouseX - centerX;
-    offsetY = mouseY - centerY;
-}
-
-function moveCenters(dx, dy) {
-  centerX -= moveCenterX(dx, dy);
-  centerY -= moveCenterY(dx, dy);
-}
-
-function moveCenterX(dx, dy){
-  return cos(worldAngle) * (dx/magicNumber) - sin(worldAngle) * (dy/magicNumber);
-}
-
-function moveCenterY(dx, dy){
-  return sin(worldAngle) * (dx/magicNumber) + cos(worldAngle) * (dy/magicNumber);
-}
-
-function keyPressed() {
-  switch (keyCode) {
-  case DELETE:
-  case BACKSPACE:
-    textTyped = textTyped.substring(0, userIndex) + textTyped.substring(userIndex+1);
-    userIndex--;
-    print(textTyped);
-    break;
-  case ENTER:
-  case RETURN:
-    // enable linebreaks
-    textTyped = textTyped.substring(0, userIndex+1) + "\n" + textTyped.substring(userIndex+1)
-    break;
-  case UP_ARROW:
-    if (pause) {
-      zoom += 0.05;
-    }
-    break;
-  case DOWN_ARROW:
-    if (pause) {
-      zoom -= 0.05;
-    }
-    break;
-  case ESCAPE:
-    if (!pause) {
-      holdCenterX = centerX;
-      holdCenterY = centerY;
-      holdZoom = zoom;
-    } else {
-      centerX = holdCenterX;
-      centerY = holdCenterY;
-      zoom = holdZoom;
-    }
-    pause = !pause;
-    break;
-  case 17: //L CTRL
-    userIndex = 0;
-    break;
-  case 113: //F2
-    if (!pause) {
-      preText = preText.replaceAll(swapOutInput.value(), swapInInput.value());
-      textTyped = textTyped.replaceAll(swapOutInput.value(), swapInInput.value());
-      pause = !pause;
-    }
-    break;
-  }
-  repositionCamera(textTyped);
-
-}
-
-function keyTyped() {
-  if (!pause) {
-    return;
-  }
-  if (keyCode >= 32) {
-    //textTyped += key;
-    
-    textTyped = textTyped.substring(0, userIndex+1) + key + textTyped.substring(userIndex+1)
-    userIndex++
-    var letter = textTyped.charAt(textTyped.length-1);
-    var letterWidth = textWidth(letter);
-  
-    // ------ letter rule table ------
-    switch (letter) {
-    case ' ': // space
-      // 50% left, 50% right
-      var dir = floor(random(0, 2));;
-      if (dir == 0) {
-        moveCenters(4,1);
-        holdCenterX -= moveCenterX(4,1);
-        holdCenterY -= moveCenterY(4,1);
-        worldAngle += QUARTER_PI;
-      }
-      if (dir == 1) {
-        moveCenters(14,-5);
-        holdCenterX -= moveCenterX(14,-5);
-        holdCenterY -= moveCenterY(14,-5);
-        worldAngle -= QUARTER_PI;
-      }
-      break;
-    case ',':
-      moveCenters(35,15);
-      holdCenterX -= moveCenterX(35,15);
-      holdCenterY -= moveCenterY(35,15);
-      worldAngle += QUARTER_PI;
-      break;
-  
-    case '.':
-      moveCenters(56,-56);
-      holdCenterX -= moveCenterX(56,-56);
-      holdCenterY -= moveCenterY(56,-56);
-      worldAngle -= HALF_PI;
-      break;
-  
-    case '!':
-      moveCenters(42.5, -17.5);
-      holdCenterX -= moveCenterX(42.5,-17.5);
-      holdCenterY -= moveCenterY(42.5,-17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '?':
-      moveCenters(42.5,-17.5);
-      holdCenterX -= moveCenterX(42.5,-17.5);
-      holdCenterY -= moveCenterY(42.5,-17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '\n': // return
-      worldAngle -= PI;
-      moveCenters(1,10);
-      holdCenterX -= moveCenterX(1,10);
-      holdCenterY -= moveCenterY(1,10);
-      break;
-  
-    default: // all others
-      moveCenters(letterWidth,0);
-      holdCenterX -= moveCenterX(letterWidth,0);
-      holdCenterY -= moveCenterY(letterWidth,0);
-    }
-    print(textTyped);
-  }
-  if(keyCode == 13) { //\n
-    userIndex++
-    worldAngle -= PI;
-    moveCenters(1,10);
-    holdCenterX -= moveCenterX(1,10);
-    holdCenterY -= moveCenterY(1,10);
-  }
-}
-
-function repositionCamera(newString) {
-  centerX = width/2;
-  centerY = height/2;
-  worldAngle = 0;
-  for (var i = 0; i < newString.length; i++) {
-    var letter = textTyped.charAt(i);
-    var letterWidth = textWidth(letter);
-  
-    // ------ letter rule table ------
-    switch (letter) {
-    case ' ': // space
-      // 50% left, 50% right
-      var dir = randomSpaceTracker[i];
-      if (dir == 0) {
-        moveCenters(4,1);
-        worldAngle += QUARTER_PI;
-      }
-      if (dir == 1) {
-        moveCenters(14,-5);
-        worldAngle -= QUARTER_PI;
-      }
-      break;
-  
-    case ',':
-      moveCenters(35,15);
-      worldAngle += QUARTER_PI;
-      break;
-  
-    case '.':
-      moveCenters(56,-56);
-      worldAngle -= HALF_PI;
-      break;
-  
-    case '!':
-      moveCenters(42.5, -17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '?':
-      moveCenters(42.5,-17.5);
-      worldAngle -= QUARTER_PI;
-      break;
-  
-    case '\n': // return
-      moveCenters(1,10);
-      worldAngle += PI;
-      break;
-  
-    default: // all others
-      moveCenters(letterWidth,0);
-    }
-  }
-}
