@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- This title is used for tabs and bookmarks -->
+	<title>Experiment X - Subject/Topic</title>
+
+	<!-- Use UTF character set, a good idea with any webpage -->
+	<meta charset="UTF-8" />
+	<!-- Set viewport so page remains consistently scaled w narrow devices -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
+	<link rel="stylesheet" type="text/css" href="../css/site.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<!-- Load jQuery library -->
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+	<!-- Load p5.js library -->
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+
+	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
+    <script type="text/javascript" src="../js/site.js" DEFER></script>
+	<!-- Use me for a JavaScript OOP Project -->
+	<script type="text/javascript" src="./js/project.js" DEFER></script>
+	<!-- Use me for a p5.js project -->
+	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+</head>
+<body>
+	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+	<main id="content">
+		<section>
+
+			<h1>Experiment 5 - What if Mario Made the Universe?</h1>
+
+			<div class="minor-section">
+				<div id="canvas-container">
+					<!-- canvas will be added here -->
+				</div>
+                <div class="fullscreen-box">
+                    <button id="fullscreen">Fullscreen</button>
+                </div>
+			</div>
+
+			<div class="minor-section">
+				<h2>Description</h2>
+				<p>Watch the Book of Genesis play out before you eyes. Edit the story and see how it changes the path of the beginning of time.</p>
+				<p>ESC - pause/unpause</p>
+				<p>How to use find and replace - enter the word/phrase/characters you want to swap out in the upper text box. Enter the what you want them to be
+					replaced with in the lower textbox. Press F2. Press ESC, the ESC again to see your results. For example you can swap out every instance of the word God with Mario.
+				</p>
+				<p>While paused:</p>
+				<p>Type - Inserts text into the story whwever the index is.</p>
+				<p>Left and right arrows - move index left and right.</p>
+				<p>Left ctrl - put index at start of story.</p>
+				<p>up and down arrow - zoom in and out</p>
+				<p>click and drag - move around canvas</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Technical</h2>
+				<p>Every frame a character from the Book of Genesis is added onto another string called textTyped. This text is then printed out accordingly. Punctuation and spaces are displayed as twists
+					and turns and moves the canvas accordingly to keep the progress centered. Only the previous 1000 charcters are printed in unpause mode to be more efficient. Pauseing and editing the text will recalculate the twists and turns 
+					to display an new path. 
+				</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Reflection</h2>
+				<p>Jack Wilhelm - A lot of math and trial and error went into this project making it very exhausting but fun to watch. Still staying one of the hardest parts was keeping track of the spaces because spaces are a 50/50 chance to turn left or right
+					and thus when recalculating all of those turns have to be properly tracked so the path properlly recreates itself as thought those changes had always existed. I think the concept of tracking the Christian origin story as the beginning of time and see how things could be changed 
+					is an interesting butterfly effect view of the creation of the world and man.
+				</p>
+			</div>
+
+		</section>
+		<nav id="links" class="minor-section">
+			<!-- Put link back to homepage here. -->
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+            </ul>
+		</nav>
+	</main>
+</body>
+</html>
