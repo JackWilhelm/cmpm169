@@ -49,28 +49,104 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
+  resetGraphs();
 }
+let yearsMagicHasBeenAround = 32
+let yearsSinceMagicStart = 1;
+let circleSizeMult = 7;
+
+let svg = d3.select("#canvas-container")
+      .append("svg")
+      .attr("width", 10000)
+      .attr("height", 10000);
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  background(220);    
   // call a method on the instance
   myInstance.myMethod();
 
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
+}
 
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
+function createCircleCharts() {
+  // Select the canvas container and append an SVG element for D3
+
+  for (let circleNum = 0; circleNum < yearsSinceMagicStart; circleNum++) {
+    let ra = getRandomAngles();
+    for (let i = 1; i < ra.length; i++) {
+      
+      let arc = d3.arc()
+        .innerRadius((circleNum*circleSizeMult)+5)
+        .outerRadius(circleNum*circleSizeMult)
+        .startAngle(ra[i-1])
+        .endAngle(ra[i]);
+
+      if (circleNum == yearsSinceMagicStart-1) {
+        arc.outerRadius(yearsMagicHasBeenAround*circleSizeMult)
+      }
+      svg.append("path")
+      .attr("transform", "translate(400,375)")
+      .attr("d", arc)
+      .attr("fill", color(random(0,225),random(0,225),random(0,225),225))
+    }
+  }
+}
+
+function getRandomAngles() {
+  const angles = [];
+  let sum = 0;
+  angles.push(0);
+
+  // Generate 4 random angles
+  for (let i = 0; i < 4; i++) {
+    let angle = Math.random() * ((2*Math.PI) - sum);
+    sum += angle;
+    angles.push(sum);
+  }
+  angles.push((2*Math.PI));
+  return angles;
+}
+
+
+
+function keyPressed() {
+  if (keyCode === RIGHT_ARROW) {
+    yearsSinceMagicStart = min(yearsMagicHasBeenAround, yearsSinceMagicStart+1);
+    resetGraphs()
+  }
+  if (keyCode === LEFT_ARROW) {
+    yearsSinceMagicStart = max(0, yearsSinceMagicStart-1);
+    resetGraphs()
+  }
+}
+
+function resetGraphs() {
+  d3.select("svg").selectAll("*").remove();
+  createCircleCharts();
+}
+
+async function fetchCards() {
+  let url = "https://api.scryfall.com/cards/search?q=c=r";
+  let allCards = [];
+
+  try {
+    while (url) {
+      let response = await fetch(url);
+      let data = await response.json();
+      
+      // Extract and print card names
+      data.data.forEach(card => console.log(card.name));
+
+      // Store the cards (optional)
+      allCards.push(...data.data);
+
+      // Get the next page URL, if it exists
+      url = data.has_more ? data.next_page : null;
+    }
+
+    console.log(`Total Red Cards: ${allCards.length}`);
+  } catch (error) {
+    console.error("Error fetching Red cards:", error);
+  }
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
