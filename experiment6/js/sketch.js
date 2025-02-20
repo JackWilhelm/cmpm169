@@ -49,17 +49,18 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
-  fetchCardsForYearAndColor();
-  
+  fetchCards();
 }
 let yearsMagicHasBeenAround = 32
 let yearsSinceMagicStart = 6;
 let circleSizeMult = 7;
 let colors = ["W", "U", "B", "R", "G"];
+let types = ["Creature", "Enchantment", "Instant", "Sorcery"]
 let yearMagicMade = 1993;
 let YearsAndColorsData = [];
 let PercentileRelativeYearsAndColorsData = [];
 let SumPercentileRelativeYearsAndColorsData = [];
+let chosenType = 0;
 
 let svg = d3.select("#canvas-container")
       .append("svg")
@@ -79,15 +80,15 @@ function createCircleCharts() {
     for (let i = 1; i < ra.length; i++) {
       let arcColor = "purple" //tester
       if (i == 1) {
-        arcColor = "white"
+        arcColor = color(228, 150, 4)
       } else if (i == 2) {
-        arcColor = "blue"
+        arcColor = color(38, 68, 144)
       } else if (i == 3) {
-        arcColor = "black"
+        arcColor = color(66, 1, 97)
       } else if (i == 4) {
-        arcColor = "red"
+        arcColor = color(126, 0, 30)
       }else {
-        arcColor = "green"
+        arcColor = color(0, 102, 51)
       }
       let arc = d3.arc()
         .innerRadius(((year-yearMagicMade)*circleSizeMult)+5)
@@ -108,44 +109,65 @@ function createCircleCharts() {
       
     }
   }
-  createClusteredBubbleChart();
+  createClusteredBubbleChart(yearsSinceMagicStart);
 }
 
-function createClusteredBubbleChart() {
+function createClusteredBubbleChart(year) {
   let xSpot = 0
   let ySpot = 0
-  const data = [
-    { cluster: "A", radius: 20 }, { cluster: "A", radius: 15 },
-    { cluster: "B", radius: 25 }, { cluster: "B", radius: 18 },
-    { cluster: "C", radius: 30 }, { cluster: "C", radius: 22 },
-    { cluster: "A", radius: 50 }, { cluster: "B", radius: 19 },
-    { cluster: "C", radius: 24 }, { cluster: "A", radius: 14 }
-  ];
+  let data = [];
+  console.log(PercentileRelativeYearsAndColorsData[year]);
+  for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+    for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+      data.push({type: types[typeIndex], cluster: colors[colorIndex], radius: 0.8 * YearsAndColorsData[year].get(colors[colorIndex]).get(types[typeIndex])})
+    }
+  }
 
-  const clusters = ["A", "B", "C"];
+  let clusters = colors;
 
-  // Force simulation
   const simulation = d3.forceSimulation(data)
     .force("x", d3.forceX(xSpot).strength(0.2))
     .force("y", d3.forceY(ySpot).strength(0.2))
     .force("collide", d3.forceCollide(d => d.radius + 2))
     .on("tick", ticked);
 
-  // Create bubble nodes
   const nodes = svg.selectAll("circle")
     .data(data)
     .enter().append("circle")
     .attr("transform", "translate(900,375)")
     .attr("r", d => d.radius)
-    .attr("fill", color("white"))
+    .attr("fill", d => {if (d.cluster == "W") {
+      return color(228, 150, 4)
+    } else if (d.cluster == "U") {
+      return color(38, 68, 144)
+    } else if (d.cluster == "B") {
+      return color(66, 1, 97)
+    } else if (d.cluster == "R") {
+      return color(126, 0, 30)
+    }else {
+      return color(0, 102, 51)
+    }})
     .call(d3.drag()
     .on("start", dragStarted)
     .on("drag", dragged)
     .on("end", dragEnded));
 
+
+  const labels = svg.selectAll("text")
+    .data(data)
+    .enter().append("text")
+    .attr("transform", "translate(900,375)")
+    .attr("text-anchor", "middle")
+    .attr("alignment-baseline", "middle")
+    .attr("fill", "black")
+    .attr("font-size", "12px")
+    .text(d => d.type);
+  
   function ticked() {
     nodes.attr("cx", d => d.x)
          .attr("cy", d => d.y);
+    labels.attr("x", d => d.x)
+         .attr("y", d => d.y);
   }
 
   function dragStarted(event, d) {
@@ -176,6 +198,11 @@ function keyPressed() {
     yearsSinceMagicStart = max(0, yearsSinceMagicStart-1);
     resetGraphs()
   }
+  if (keyCode === 83) {
+    chosenType++
+    chosenType %= 5;
+    adjustToRelativePercents()
+  }
 }
 
 function resetGraphs() {
@@ -185,19 +212,25 @@ function resetGraphs() {
 
 
 
-async function fetchCardsForYearAndColor() {
+async function fetchCards() {
   let url = "";
   let promises = [];
+  
   for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
     YearsAndColorsData[year-yearMagicMade] = new Map();
+    console.log(year-yearMagicMade)
     for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
-      url = `https://api.scryfall.com/cards/search?q=year%3D${year}+c%3D${colors[colorIndex]}`;
-      promises.push(fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        YearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], data.total_cards);
-      })
-      .catch(error => console.error("Error fetching Red cards:", error)));
+      YearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], new Map());
+      for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+        await new Promise(resolve => setTimeout(resolve, 10));
+        url = `https://api.scryfall.com/cards/search?q=year%3D${year}+c%3D${colors[colorIndex]}+not%3Areprint+type%3D${types[typeIndex]}`;
+        promises.push(fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]).set(types[typeIndex], data.total_cards);
+        })
+        .catch(error => console.error("Error fetching cards cards:", error, year, colors[colorIndex], types[typeIndex])));
+      }
     }
   }
   await Promise.all(promises);
@@ -207,16 +240,37 @@ async function fetchCardsForYearAndColor() {
 }
 
 function adjustToRelativePercents() {
-  for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
-    let sumOfCardsThisYear = 0;
-    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
-      sumOfCardsThisYear += YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]);
+  if (chosenType == 4) {
+    for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
+      let sumOfCardsThisYear = 0;
+      for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+        for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+          sumOfCardsThisYear += YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]).get(types[typeIndex]);
+        }
+      }
+      PercentileRelativeYearsAndColorsData[year-yearMagicMade] = new Map();
+      for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+        let sumOfColorCardsThisYear = 0;
+        for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+          sumOfColorCardsThisYear += YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]).get(types[typeIndex]);
+        }
+        PercentileRelativeYearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], sumOfColorCardsThisYear/sumOfCardsThisYear);
+      }
     }
-    PercentileRelativeYearsAndColorsData[year-yearMagicMade] = new Map();
-    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
-      PercentileRelativeYearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex])/sumOfCardsThisYear);
+  } else {
+    let type = types[chosenType];
+    for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
+      let sumOfCardsThisYear = 0;
+      for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+        sumOfCardsThisYear += YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]).get(type);
+      }
+      PercentileRelativeYearsAndColorsData[year-yearMagicMade] = new Map();
+      for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+        PercentileRelativeYearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]).get(type)/sumOfCardsThisYear);
+      }
     }
   }
+  
   adjustToSumRelativePercentsArray();
 }
 
@@ -231,6 +285,7 @@ function adjustToSumRelativePercentsArray() {
   }
   resetGraphs();
 }
+
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
