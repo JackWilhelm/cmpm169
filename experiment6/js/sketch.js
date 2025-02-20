@@ -49,16 +49,22 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
-  resetGraphs();
+  fetchCardsForYearAndColor();
+  
 }
 let yearsMagicHasBeenAround = 32
-let yearsSinceMagicStart = 1;
+let yearsSinceMagicStart = 6;
 let circleSizeMult = 7;
+let colors = ["W", "U", "B", "R", "G"];
+let yearMagicMade = 1993;
+let YearsAndColorsData = [];
+let PercentileRelativeYearsAndColorsData = [];
+let SumPercentileRelativeYearsAndColorsData = [];
 
 let svg = d3.select("#canvas-container")
       .append("svg")
-      .attr("width", 10000)
-      .attr("height", 10000);
+      .attr("width", $("#canvas-container").width())
+      .attr("height", $("#canvas-container").height()+500);
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -68,44 +74,97 @@ function draw() {
 }
 
 function createCircleCharts() {
-  // Select the canvas container and append an SVG element for D3
-
-  for (let circleNum = 0; circleNum < yearsSinceMagicStart; circleNum++) {
-    let ra = getRandomAngles();
+  for (let year = yearMagicMade; year <= yearMagicMade + yearsSinceMagicStart; year++) {
+    let ra = SumPercentileRelativeYearsAndColorsData[year-yearMagicMade];
     for (let i = 1; i < ra.length; i++) {
-      
+      let arcColor = "purple" //tester
+      if (i == 1) {
+        arcColor = "white"
+      } else if (i == 2) {
+        arcColor = "blue"
+      } else if (i == 3) {
+        arcColor = "black"
+      } else if (i == 4) {
+        arcColor = "red"
+      }else {
+        arcColor = "green"
+      }
       let arc = d3.arc()
-        .innerRadius((circleNum*circleSizeMult)+5)
-        .outerRadius(circleNum*circleSizeMult)
-        .startAngle(ra[i-1])
-        .endAngle(ra[i]);
+        .innerRadius(((year-yearMagicMade)*circleSizeMult)+5)
+        .outerRadius((year-yearMagicMade)*circleSizeMult)
+        .startAngle(ra[i-1] * (2*Math.PI))
+        .endAngle(ra[i] * (2*Math.PI))
+        .padAngle(0.02);
 
-      if (circleNum == yearsSinceMagicStart-1) {
-        arc.outerRadius(yearsMagicHasBeenAround*circleSizeMult)
+      if (year == yearMagicMade + yearsSinceMagicStart) {
+        console.log(year);
+        arc.outerRadius((yearsMagicHasBeenAround+4)*circleSizeMult)
       }
       svg.append("path")
       .attr("transform", "translate(400,375)")
       .attr("d", arc)
-      .attr("fill", color(random(0,225),random(0,225),random(0,225),225))
+      .attr("fill", color(arcColor))
+
+      
     }
   }
+  createClusteredBubbleChart();
 }
 
-function getRandomAngles() {
-  const angles = [];
-  let sum = 0;
-  angles.push(0);
+function createClusteredBubbleChart() {
+  let xSpot = 0
+  let ySpot = 0
+  const data = [
+    { cluster: "A", radius: 20 }, { cluster: "A", radius: 15 },
+    { cluster: "B", radius: 25 }, { cluster: "B", radius: 18 },
+    { cluster: "C", radius: 30 }, { cluster: "C", radius: 22 },
+    { cluster: "A", radius: 50 }, { cluster: "B", radius: 19 },
+    { cluster: "C", radius: 24 }, { cluster: "A", radius: 14 }
+  ];
 
-  // Generate 4 random angles
-  for (let i = 0; i < 4; i++) {
-    let angle = Math.random() * ((2*Math.PI) - sum);
-    sum += angle;
-    angles.push(sum);
+  const clusters = ["A", "B", "C"];
+
+  // Force simulation
+  const simulation = d3.forceSimulation(data)
+    .force("x", d3.forceX(xSpot).strength(0.2))
+    .force("y", d3.forceY(ySpot).strength(0.2))
+    .force("collide", d3.forceCollide(d => d.radius + 2))
+    .on("tick", ticked);
+
+  // Create bubble nodes
+  const nodes = svg.selectAll("circle")
+    .data(data)
+    .enter().append("circle")
+    .attr("transform", "translate(900,375)")
+    .attr("r", d => d.radius)
+    .attr("fill", color("white"))
+    .call(d3.drag()
+    .on("start", dragStarted)
+    .on("drag", dragged)
+    .on("end", dragEnded));
+
+  function ticked() {
+    nodes.attr("cx", d => d.x)
+         .attr("cy", d => d.y);
   }
-  angles.push((2*Math.PI));
-  return angles;
-}
 
+  function dragStarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(event, d) {
+    d.fx = event.x; 
+    d.fy = event.y; 
+  }
+
+  function dragEnded(event, d) {
+    if (!event.active) simulation.alphaTarget(0); 
+    d.fx = null;
+    d.fy = null;
+  }
+}
 
 
 function keyPressed() {
@@ -124,29 +183,53 @@ function resetGraphs() {
   createCircleCharts();
 }
 
-async function fetchCards() {
-  let url = "https://api.scryfall.com/cards/search?q=c=r";
-  let allCards = [];
 
-  try {
-    while (url) {
-      let response = await fetch(url);
-      let data = await response.json();
-      
-      // Extract and print card names
-      data.data.forEach(card => console.log(card.name));
 
-      // Store the cards (optional)
-      allCards.push(...data.data);
-
-      // Get the next page URL, if it exists
-      url = data.has_more ? data.next_page : null;
+async function fetchCardsForYearAndColor() {
+  let url = "";
+  let promises = [];
+  for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
+    YearsAndColorsData[year-yearMagicMade] = new Map();
+    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+      url = `https://api.scryfall.com/cards/search?q=year%3D${year}+c%3D${colors[colorIndex]}`;
+      promises.push(fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        YearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], data.total_cards);
+      })
+      .catch(error => console.error("Error fetching Red cards:", error)));
     }
-
-    console.log(`Total Red Cards: ${allCards.length}`);
-  } catch (error) {
-    console.error("Error fetching Red cards:", error);
   }
+  await Promise.all(promises);
+
+  console.log(YearsAndColorsData);
+  adjustToRelativePercents();
+}
+
+function adjustToRelativePercents() {
+  for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
+    let sumOfCardsThisYear = 0;
+    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+      sumOfCardsThisYear += YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex]);
+    }
+    PercentileRelativeYearsAndColorsData[year-yearMagicMade] = new Map();
+    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+      PercentileRelativeYearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], YearsAndColorsData[year-yearMagicMade].get(colors[colorIndex])/sumOfCardsThisYear);
+    }
+  }
+  adjustToSumRelativePercentsArray();
+}
+
+function adjustToSumRelativePercentsArray() {
+  for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
+    SumPercentileRelativeYearsAndColorsData[year-yearMagicMade] = [0];
+    let sumPercent = 0;
+    for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+      sumPercent += PercentileRelativeYearsAndColorsData[year-yearMagicMade].get((colors[colorIndex]));
+      SumPercentileRelativeYearsAndColorsData[year-yearMagicMade].push(sumPercent);
+    }
+  }
+  resetGraphs();
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
