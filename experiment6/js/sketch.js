@@ -61,6 +61,7 @@ let YearsAndColorsData = [];
 let PercentileRelativeYearsAndColorsData = [];
 let SumPercentileRelativeYearsAndColorsData = [];
 let chosenType = 0;
+let ready = false;
 
 let svg = d3.select("#canvas-container")
       .append("svg")
@@ -75,6 +76,11 @@ function draw() {
   textSize(50);
   stroke(color("white"));
   textAlign(CENTER, CENTER);
+  if (!ready) {
+    textSize(150);
+    text("LOADING", width/2, height/2);
+    return;
+  }
   if (chosenType > 3) {
     text(`Type: All` , 375, height-20);
   } else {
@@ -273,7 +279,7 @@ async function fetchCards() {
     for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
       YearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], new Map());
       for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise(resolve => setTimeout(resolve, 30));
         url = `https://api.scryfall.com/cards/search?q=year%3D${year}+c%3D${colors[colorIndex]}+not%3Areprint+type%3D${types[typeIndex]}`;
         promises.push(fetch(url)
         .then(response => response.json())
@@ -285,7 +291,7 @@ async function fetchCards() {
     }
   }
   await Promise.all(promises);
-
+  ready = true;
   adjustToRelativePercents();
 }
 
@@ -333,6 +339,7 @@ function adjustToSumRelativePercentsArray() {
       SumPercentileRelativeYearsAndColorsData[year-yearMagicMade].push(sumPercent);
     }
   }
+  
   resetGraphs();
 }
 
