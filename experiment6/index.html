@@ -34,7 +34,7 @@
 	<main id="content">
 		<section>
 
-			<h1>Experiment 5 - What if Mario Made the Universe?</h1>
+			<h1>Experiment 6 - Magic the Gathering Over the Years</h1>
 
 			<div class="minor-section">
 				<div id="canvas-container">
@@ -47,32 +47,24 @@
 
 			<div class="minor-section">
 				<h2>Description</h2>
-				<p>Watch the Book of Genesis play out before you eyes. Edit the story and see how it changes the path of the beginning of time.</p>
-				<p>ESC - pause/unpause</p>
-				<p>How to use find and replace - enter the word/phrase/characters you want to swap out in the upper text box. Enter the what you want them to be
-					replaced with in the lower textbox. Press F2. Press ESC, the ESC again to see your results. For example you can swap out every instance of the word God with Mario.
+				<p>Watch how the distribution of Magic the Gatherings card colors and types change over the years. The graph on the left shows the distribution
+					of colors over each year based on the type of card. The bubble graph shows the distribution of card colors and types. The squares on the right represetn 5 cards of each color in that year.
 				</p>
-				<p>While paused:</p>
-				<p>Type - Inserts text into the story whwever the index is.</p>
-				<p>Left and right arrows - move index left and right.</p>
-				<p>Left ctrl - put index at start of story.</p>
-				<p>up and down arrow - zoom in and out</p>
-				<p>click and drag - move around canvas</p>
+				<p>S - change card type</p>
+				<p>Left/Right arrow - change year</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Every frame a character from the Book of Genesis is added onto another string called textTyped. This text is then printed out accordingly. Punctuation and spaces are displayed as twists
-					and turns and moves the canvas accordingly to keep the progress centered. Only the previous 1000 charcters are printed in unpause mode to be more efficient. Pauseing and editing the text will recalculate the twists and turns 
-					to display an new path. 
+				<p>Using Scryfall's API, data for each year of magic since its start in 1993 is pulled and sorted by color and type. This data is then represented by percents and fed into an arc graph. Using the numbers of each color and
+					type without converting it to percents results in the data for the bubble chart. And lastly the data for the squares is each color gets a square for every 5 cards of that color during that year.
 				</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Jack Wilhelm - A lot of math and trial and error went into this project making it very exhausting but fun to watch. Still staying one of the hardest parts was keeping track of the spaces because spaces are a 50/50 chance to turn left or right
-					and thus when recalculating all of those turns have to be properly tracked so the path properlly recreates itself as thought those changes had always existed. I think the concept of tracking the Christian origin story as the beginning of time and see how things could be changed 
-					is an interesting butterfly effect view of the creation of the world and man.
+				<p>Jack Wilhelm - Juggling all my responsibilities I luckily found just enough time to get this project done. I dove into graphing and Scryfalls API's to represent one of my favorite hobbies. After struggling with 
+					the D3.js program I was able to get some interesting anad interactable graphs and charts that satisfied my needs.
 				</p>
 			</div>
 
