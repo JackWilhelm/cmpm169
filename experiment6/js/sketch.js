@@ -71,7 +71,16 @@ let svg = d3.select("#canvas-container")
 function draw() {
   // call a method on the instance
   myInstance.myMethod();
-
+  background(92, 64, 51);
+  textSize(50);
+  stroke(color("white"));
+  textAlign(CENTER, CENTER);
+  if (chosenType > 3) {
+    text(`Type: All` , 375, height-20);
+  } else {
+    text(`Type: ${types[chosenType]}` , 375, height-20);
+  }
+  text(`Year: ${yearMagicMade+yearsSinceMagicStart}`, width/2, 30);
 }
 
 function createCircleCharts() {
@@ -98,7 +107,6 @@ function createCircleCharts() {
         .padAngle(0.02);
 
       if (year == yearMagicMade + yearsSinceMagicStart) {
-        console.log(year);
         arc.outerRadius((yearsMagicHasBeenAround+4)*circleSizeMult)
       }
       svg.append("path")
@@ -106,7 +114,6 @@ function createCircleCharts() {
       .attr("d", arc)
       .attr("fill", color(arcColor))
 
-      
     }
   }
   createClusteredBubbleChart(yearsSinceMagicStart);
@@ -116,25 +123,39 @@ function createClusteredBubbleChart(year) {
   let xSpot = 0
   let ySpot = 0
   let data = [];
-  console.log(PercentileRelativeYearsAndColorsData[year]);
   for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
     for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
       data.push({type: types[typeIndex], cluster: colors[colorIndex], radius: 0.8 * YearsAndColorsData[year].get(colors[colorIndex]).get(types[typeIndex])})
     }
   }
 
+  let data2 = [];
+  for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
+    for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+      for (let i = 0; i < YearsAndColorsData[year].get(colors[colorIndex]).get(types[typeIndex])/5; i++) {
+        data2.push({type: types[typeIndex], cluster: colors[colorIndex], radius: 0.8 * YearsAndColorsData[year].get(colors[colorIndex]).get(types[typeIndex])})
+      }
+    }
+  }
+  
+  let squareSize = 10;
   let clusters = colors;
-
   const simulation = d3.forceSimulation(data)
     .force("x", d3.forceX(xSpot).strength(0.2))
     .force("y", d3.forceY(ySpot).strength(0.2))
     .force("collide", d3.forceCollide(d => d.radius + 2))
     .on("tick", ticked);
 
+  const squaresSimulation = d3.forceSimulation(data2)
+    .force("x", d3.forceX(xSpot).strength(0.05))
+    .force("y", d3.forceY(ySpot).strength(0.05))
+    .force("collide", d3.forceCollide(d => squareSize))
+    .on("tick", ticked);
+
   const nodes = svg.selectAll("circle")
     .data(data)
     .enter().append("circle")
-    .attr("transform", "translate(900,375)")
+    .attr("transform", `translate(900,375)`)
     .attr("r", d => d.radius)
     .attr("fill", d => {if (d.cluster == "W") {
       return color(228, 150, 4)
@@ -153,25 +174,55 @@ function createClusteredBubbleChart(year) {
     .on("end", dragEnded));
 
 
+  
+  const squares = svg.selectAll("rect")
+    .data(data2)
+    .enter().append("rect")
+    .attr("transform", `translate(${canvasContainer.width() * 9/10},375)`)
+    .attr("width", squareSize)
+    .attr("height", squareSize)
+    .attr("fill", r => {if (r.cluster == "W") {
+      return color(228, 150, 4)
+    } else if (r.cluster == "U") {
+      return color(38, 68, 144)
+    } else if (r.cluster == "B") {
+      return color(66, 1, 97)
+    } else if (r.cluster == "R") {
+      return color(126, 0, 30)
+    }else {
+      return color(0, 102, 51)
+    }})
+    .call(d3.drag()
+    .on("start", dragStarted)
+    .on("drag", dragged)
+    .on("end", dragEnded));
+  
   const labels = svg.selectAll("text")
     .data(data)
     .enter().append("text")
     .attr("transform", "translate(900,375)")
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "middle")
-    .attr("fill", "black")
+    .attr("fill", "white")
     .attr("font-size", "12px")
+    .style("user-select", "none")
+    .style("pointer-events", "none")
     .text(d => d.type);
   
   function ticked() {
     nodes.attr("cx", d => d.x)
          .attr("cy", d => d.y);
+    squares.attr("x", d => d.x - squareSize / 2)
+         .attr("y", d => d.y - squareSize / 2);
     labels.attr("x", d => d.x)
          .attr("y", d => d.y);
   }
 
   function dragStarted(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
+    if (!event.active) {
+      simulation.alphaTarget(0.3).restart();
+      squaresSimulation.alphaTarget(0.3).restart();
+    }
     d.fx = d.x;
     d.fy = d.y;
   }
@@ -235,7 +286,6 @@ async function fetchCards() {
   }
   await Promise.all(promises);
 
-  console.log(YearsAndColorsData);
   adjustToRelativePercents();
 }
 
