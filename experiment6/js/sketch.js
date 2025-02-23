@@ -62,6 +62,7 @@ let PercentileRelativeYearsAndColorsData = [];
 let SumPercentileRelativeYearsAndColorsData = [];
 let chosenType = 0;
 let ready = false;
+let yearsLoaded = 0;
 
 let svg = d3.select("#canvas-container")
       .append("svg")
@@ -78,7 +79,7 @@ function draw() {
   textAlign(CENTER, CENTER);
   if (!ready) {
     textSize(150);
-    text("LOADING", width/2, height/2);
+    text("LOADING " + yearsLoaded + "/32", width/2, height/2);
     return;
   }
   if (chosenType > 3) {
@@ -276,10 +277,11 @@ async function fetchCards() {
   for (let year = yearMagicMade; year <= yearMagicMade + yearsMagicHasBeenAround; year++) {
     YearsAndColorsData[year-yearMagicMade] = new Map();
     console.log(year-yearMagicMade)
+    yearsLoaded = year-yearMagicMade;
     for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
       YearsAndColorsData[year-yearMagicMade].set(colors[colorIndex], new Map());
       for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
-        await new Promise(resolve => setTimeout(resolve, 30));
+        await new Promise(resolve => setTimeout(resolve, 60));
         url = `https://api.scryfall.com/cards/search?q=year%3D${year}+c%3D${colors[colorIndex]}+not%3Areprint+type%3D${types[typeIndex]}`;
         promises.push(fetch(url)
         .then(response => response.json())
