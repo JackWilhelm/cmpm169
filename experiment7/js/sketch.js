@@ -34,6 +34,10 @@ function resizeScreen() {
   // redrawCanvas(); // Redraw everything based on new size
 }
 
+const net = new brain.NeuralNetwork();
+const padlength = 50
+const savedModel = localStorage.getItem('trainedModel');
+
 // setup() function is called once when the program starts
 function setup() {
   // place our canvas, making it fit our container
@@ -49,7 +53,49 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
+
+  if (savedModel) {
+    // Load the saved model from localStorage
+    net.fromJSON(JSON.parse(savedModel));
+    console.log("Model loaded from localStorage.");
+  } else {
+    // If no model is found, train the network
+    const trainingData = [
+      {input: createArrayFromString("Rachel’s heart did a sank in the lobby of the Springhill Suites. Her"), output: {Adjective: 1}},
+      {input: createArrayFromString("engagement ring, adorned a"), output: {Adjective: 1}},
+      {input: createArrayFromString("diamond, was gone! Vanished! In Orlando, of all places, during a"), output: {Adjective: 1}},
+      {input: createArrayFromString("business trip. She’d arrived that afternoon, a blur of "), output: {Adjective: 1}},
+      {input: createArrayFromString("taxis. “It has to be here,” she "), output: {PTVerb: 1}},
+      {input: createArrayFromString(", dumping her"), output: {Adjective: 1}},
+      {input: createArrayFromString("suitcase onto the"), output: {Noun: 1}},
+      {input: createArrayFromString("knock announced her coworkers, Jana and Todd. They’d seen her"), output: {Adjective: 1}},
+      {input: createArrayFromString("face in the hallway and came to"), output: {Verb: 1}},
+      {input: createArrayFromString("“Everything okay?” Todd asked, looking"), output: {Adjective: 1}},
+      {input: createArrayFromString("“My Ring!” Rachel cried, waving her hands. “I lost it!” My fiancé Karl is going to be so "), output: {Adjective: 1}},
+      {input: createArrayFromString("As the sun set, their"), output: {Noun: 1}},
+      {input: createArrayFromString("Rachel felt"), output: {Adjective: 1}},
+      {input: createArrayFromString("Back at the"), output: {Noun: 1}},
+      {input: createArrayFromString("Then, laughter. Todd and Jana"), output: {PTVerb: 1}},
+    ];
+    net.train(trainingData);
+    localStorage.setItem('trainedModel', JSON.stringify(net.toJSON()));
+  }
+
+  
+
+  let output = net.run(createArrayFromString("I went to the grocery store"));
+  console.log('Output:', output);
 }
+
+function createArrayFromString(string) {
+  let inputArray = [];
+  inputArray = string.split('').map(char => char.charCodeAt(0));
+  while (inputArray.length < 100) {
+    inputArray.push(0);
+  }
+  return inputArray;
+}
+
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
