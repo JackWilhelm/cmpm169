@@ -36,7 +36,58 @@ function resizeScreen() {
 
 const net = new brain.NeuralNetwork();
 const padlength = 50
-const savedModel = localStorage.getItem('trainedModel');
+let typedText = "";
+let wordDictionary = {
+  Adjective: [
+    "happy", "sad", "bright", "dark", "cold", "hot", "beautiful", "ugly", "slow", "quick",
+    "strong", "weak", "light", "heavy", "soft", "hard", "loud", "quiet", "funny", "serious",
+    "rich", "poor", "fresh", "stale", "smooth", "rough", "clear", "cloudy", "warm", "clean",
+    "dirty", "new", "old", "clean", "messy", "bright", "dim"
+  ],
+  Noun: [
+    "dog", "cat", "tree", "car", "house", "book", "computer", "phone", "person", "student",
+    "teacher", "child", "adult", "food", "apple", "banana", "orange", "city", "country",
+    "mountain", "river", "building", "flower", "city", "street", "shirt", "dog", "fish", "ball"
+  ],
+  Verb: [
+    "running", "jumping", "swimming", "talking", "listening", "watching", "writing", "reading",
+    "sleeping", "eating", "drinking", "playing", "studying", "working", "thinking", "speaking",
+    "dancing", "singing", "drawing", "painting", "traveling", "meeting", "helping", "pushing",
+    "pulling", "opening", "closing", "sitting", "standing", "driving", "climbing", "skipping",
+    "looking", "bringing"
+  ],
+  PNoun: [
+    "dogs", "cats", "trees", "cars", "houses", "books", "computers", "phones", "people", "students",
+    "teachers", "children", "adults", "apples", "bananas", "oranges", "flowers", "buildings", "cities",
+    "streets", "shirts", "fish", "balls", "cakes", "buses", "airplanes", "clothes", "shoes", "games"
+  ],
+  PTVerb: [
+    "ran", "jumped", "swam", "talked", "listened", "watched", "wrote", "read", "slept", "ate", "drank",
+    "played", "studied", "worked", "thought", "spoke", "danced", "sang", "drew", "painted", "traveled",
+    "met", "helped", "pushed", "pulled", "opened", "closed", "sat", "stood", "drove", "climbed", "skipped",
+    "looked", "brought"
+  ]
+};
+
+const functionWords = [
+  // Conjunctions
+  "and", "but", "or", "nor", "for", "yet", "so", "either", "neither", "because", "although", "since", "unless",
+  
+  // Prepositions
+  "in", "on", "at", "by", "for", "with", "about", "against", "between", "under", "over", "through", "during", 
+  "before", "after", "to", "from", "up", "down", "inside", "outside", "beneath", "beyond", "upon", "within",
+  
+  // Pronouns
+  "he", "she", "it", "they", "we", "you", "him", "her", "them", "us", "me", "this", "that", "these", "those",
+  
+  // Articles
+  "the", "a", "an",
+  
+  // Be Verbs (Auxiliary Verbs)
+  "is", "are", "am", "was", "were", "been", "being"
+];
+
+
 
 // setup() function is called once when the program starts
 function setup() {
@@ -54,37 +105,78 @@ function setup() {
   });
   resizeScreen();
 
-  if (savedModel) {
-    // Load the saved model from localStorage
-    net.fromJSON(JSON.parse(savedModel));
-    console.log("Model loaded from localStorage.");
-  } else {
-    // If no model is found, train the network
+
     const trainingData = [
-      {input: createArrayFromString("Rachel’s heart did a sank in the lobby of the Springhill Suites. Her"), output: {Adjective: 1}},
-      {input: createArrayFromString("engagement ring, adorned a"), output: {Adjective: 1}},
-      {input: createArrayFromString("diamond, was gone! Vanished! In Orlando, of all places, during a"), output: {Adjective: 1}},
-      {input: createArrayFromString("business trip. She’d arrived that afternoon, a blur of "), output: {Adjective: 1}},
-      {input: createArrayFromString("taxis. “It has to be here,” she "), output: {PTVerb: 1}},
-      {input: createArrayFromString(", dumping her"), output: {Adjective: 1}},
-      {input: createArrayFromString("suitcase onto the"), output: {Noun: 1}},
-      {input: createArrayFromString("knock announced her coworkers, Jana and Todd. They’d seen her"), output: {Adjective: 1}},
-      {input: createArrayFromString("face in the hallway and came to"), output: {Verb: 1}},
-      {input: createArrayFromString("“Everything okay?” Todd asked, looking"), output: {Adjective: 1}},
-      {input: createArrayFromString("“My Ring!” Rachel cried, waving her hands. “I lost it!” My fiancé Karl is going to be so "), output: {Adjective: 1}},
-      {input: createArrayFromString("As the sun set, their"), output: {Noun: 1}},
-      {input: createArrayFromString("Rachel felt"), output: {Adjective: 1}},
-      {input: createArrayFromString("Back at the"), output: {Noun: 1}},
-      {input: createArrayFromString("Then, laughter. Todd and Jana"), output: {PTVerb: 1}},
+      {input: createArrayFromString("The quick brown fox jumped over the lazy dog"), output: {Adjective: 1}},
+{input: createArrayFromString("She felt incredibly happy after the success"), output: {Adjective: 1}},
+{input: createArrayFromString("The sun rose slowly over the horizon"), output: {Adjective: 1}},
+{input: createArrayFromString("The tiny mouse scurried across the floor"), output: {Adjective: 1}},
+{input: createArrayFromString("The wind howled through the trees"), output: {Noun: 1}},
+{input: createArrayFromString("He packed his suitcase in the morning"), output: {Noun: 1}},
+{input: createArrayFromString("They sat at the table eating their breakfast"), output: {Noun: 1}},
+{input: createArrayFromString("She found a wallet on the ground"), output: {Noun: 1}},
+{input: createArrayFromString("I love to run in the park"), output: {Verb: 1}},
+{input: createArrayFromString("He quickly ran to the store"), output: {Verb: 1}},
+{input: createArrayFromString("They decided to leave early in the morning"), output: {Verb: 1}},
+{input: createArrayFromString("She yelled for help in the dark"), output: {Verb: 1}},
+{input: createArrayFromString("He walked through the muddy path"), output: {PTVerb: 1}},
+{input: createArrayFromString("She laughed at the funny joke"), output: {PTVerb: 1}},
+{input: createArrayFromString("They played in the yard all afternoon"), output: {PTVerb: 1}},
+{input: createArrayFromString("John finished his work and went home"), output: {PTVerb: 1}},
+{input: createArrayFromString("The dogs barked at the mailman"), output: {PNoun: 1}},
+{input: createArrayFromString("The children were playing in the garden"), output: {PNoun: 1}},
+{input: createArrayFromString("There were many birds flying in the sky"), output: {PNoun: 1}},
+{input: createArrayFromString("The teachers gathered in the staff room"), output: {PNoun: 1}},
+{input: createArrayFromString("The storm caused great damage to the houses"), output: {Adjective: 1}},
+{input: createArrayFromString("A giant tree stood in the middle of the field"), output: {Adjective: 1}},
+{input: createArrayFromString("He wore a green jacket and red boots"), output: {Adjective: 1}},
+{input: createArrayFromString("The tiny bird flew away with ease"), output: {Adjective: 1}},
+{input: createArrayFromString("She picked up the book from the table"), output: {Noun: 1}},
+{input: createArrayFromString("A delicious cake was sitting on the counter"), output: {Noun: 1}},
+{input: createArrayFromString("The old lamp flickered in the corner"), output: {Noun: 1}},
+{input: createArrayFromString("He placed the vase carefully on the shelf"), output: {Noun: 1}},
+{input: createArrayFromString("I love to dance in the rain"), output: {Verb: 1}},
+{input: createArrayFromString("She runs faster than anyone else in the team"), output: {Verb: 1}},
+{input: createArrayFromString("They studied for hours before the exam"), output: {Verb: 1}},
+{input: createArrayFromString("He sleeps early every night"), output: {Verb: 1}},
+{input: createArrayFromString("They visited the museum last weekend"), output: {PTVerb: 1}},
+{input: createArrayFromString("She traveled to Paris last year"), output: {PTVerb: 1}},
+{input: createArrayFromString("He finished his lunch before leaving the office"), output: {PTVerb: 1}},
+{input: createArrayFromString("They played football until sunset"), output: {PTVerb: 1}},
+{input: createArrayFromString("The monkeys jumped from tree to tree"), output: {PNoun: 1}},
+{input: createArrayFromString("The students finished their assignments on time"), output: {PNoun: 1}},
+{input: createArrayFromString("The fish swam in the tank"), output: {PNoun: 1}},
+{input: createArrayFromString("The soldiers marched across the field"), output: {PNoun: 1}},
+{input: createArrayFromString("She smiled brightly at the compliment"), output: {Adjective: 1}},
+{input: createArrayFromString("The house was warm and inviting"), output: {Adjective: 1}},
+{input: createArrayFromString("The sky turned dark as the storm approached"), output: {Adjective: 1}},
+{input: createArrayFromString("Her laughter echoed in the hall"), output: {Adjective: 1}},
+{input: createArrayFromString("The dog wagged its tail happily"), output: {Noun: 1}},
+{input: createArrayFromString("He reached for the keys on the shelf"), output: {Noun: 1}},
+{input: createArrayFromString("The phone rang loudly in the quiet room"), output: {Noun: 1}},
+{input: createArrayFromString("I wrote a letter to my friend"), output: {Noun: 1}},
+{input: createArrayFromString("They wanted to leave immediately"), output: {Verb: 1}},
+{input: createArrayFromString("She shouted for help when she saw the fire"), output: {Verb: 1}},
+{input: createArrayFromString("He raised his hand to ask a question"), output: {Verb: 1}},
+{input: createArrayFromString("We need to clean the house before dinner"), output: {Verb: 1}},
+{input: createArrayFromString("The teacher spoke loudly in the classroom"), output: {PTVerb: 1}},
+{input: createArrayFromString("She completed her homework on time"), output: {PTVerb: 1}},
+{input: createArrayFromString("He painted the wall last weekend"), output: {PTVerb: 1}},
+{input: createArrayFromString("They traveled to London for the holidays"), output: {PTVerb: 1}},
+{input: createArrayFromString("The flowers bloomed brightly in the garden"), output: {PNoun: 1}},
+{input: createArrayFromString("The children played with their toys in the living room"), output: {PNoun: 1}},
+{input: createArrayFromString("The birds chirped loudly in the morning"), output: {PNoun: 1}},
+{input: createArrayFromString("The books are scattered on the table"), output: {PNoun: 1}},
+
     ];
     net.train(trainingData);
-    localStorage.setItem('trainedModel', JSON.stringify(net.toJSON()));
-  }
 
   
 
-  let output = net.run(createArrayFromString("I went to the grocery store"));
-  console.log('Output:', output);
+  
+  textSize(32);
+  textWrap(WORD);
+  textAlign(LEFT, TOP);
 }
 
 function createArrayFromString(string) {
@@ -96,27 +188,60 @@ function createArrayFromString(string) {
   return inputArray;
 }
 
+let maxLabel = "";
+let maxValue = -Infinity;
+
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
+  
   background(220);    
   // call a method on the instance
   myInstance.myMethod();
+  
+  let x = 20;
+  let y = 100;
+  
+  for (let i = 0; i < typedText.length; i++) {
+    if (i % 2 === 0) {
+      fill(0);  // Regular color (black)
+    } else {
+      fill(255, 0, 0);  // Red color for every second letter
+    }
+    
+    text(typedText[i], x, y);  // Draw each character
+    
+    x += textWidth(typedText[i]);  // Move x position for the next character
+  }
+}
 
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
+function keyTyped() {
+  if (key === " ") {
+    let recentText = typedText.slice(-50);
+    let recentWords = recentText.split(" ");
+    let lastWord = recentWords.pop();
+    typedText += " ";
+    if (typedText.length > 20 && Math.random() < 0.5 && functionWords.includes(lastWord)) {
+      let output = net.run(createArrayFromString(recentText));
+      for (let label in output) {
+        if (output[label] > maxValue) {
+          maxValue = output[label];
+          maxLabel = label;
+        }
+      }
+      typedText += random(wordDictionary[maxLabel]) + " ";
+    }
+    return false;
+  } else {
+    typedText += key;
+  }
+}
 
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
+function keyPressed() {
+  if (keyCode === BACKSPACE) {
+    typedText = typedText.slice(0, -1);
+    return false;
+  }
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
