@@ -34,7 +34,7 @@
 	<main id="content">
 		<section>
 
-			<h1>Experiment 6 - Magic the Gathering Over the Years</h1>
+			<h1>Experiment 7 - Reverse Mad Libs</h1>
 
 			<div class="minor-section">
 				<div id="canvas-container">
@@ -47,24 +47,27 @@
 
 			<div class="minor-section">
 				<h2>Description</h2>
-				<p>Watch how the distribution of Magic the Gatherings card colors and types change over the years. The graph on the left shows the distribution
-					of colors over each year based on the type of card. The bubble graph shows the distribution of card colors and types. The squares on the right represetn 5 cards of each color in that year.
+				<p>Normally in the game Mad Libs, one player asks another player for verbs, nouns, adjectives and other kinds of words to fill in a ridiculous story revealed at the end.
+					In this project however, as you type the story, the program will every now and then guess what type of word (noun, verb, adjective, etc) and choose a random one to add 
+					to your story. The word data at the bottom shows the suredness of each type of word.
 				</p>
-				<p>S - change card type</p>
-				<p>Left/Right arrow - change year</p>
+				<p>Up/Down arrow - scroll up / down</p>
+				<p>ENTER - force fill the next word</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Using Scryfall's API, data for each year of magic since its start in 1993 is pulled and sorted by color and type. This data is then represented by percents and fed into an arc graph. Using the numbers of each color and
-					type without converting it to percents results in the data for the bubble chart. And lastly the data for the squares is each color gets a square for every 5 cards of that color during that year.
-				</p>
+				<p>Using brain.js I created and trained a network that is inputed a string in the form of an array of ASCII numbers with the appropriate output being what kind of word should 
+					come next. For example input: "I love to" output: Verb. After training, the program will try to find a suitable word based on the end of the text whenever the user presses SPACE.
+					The brain thinks of which type of word is most suitable and will grab a random word of that type from a dictionary of arrays and print that word.
+				</p>>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Jack Wilhelm - Juggling all my responsibilities I luckily found just enough time to get this project done. I dove into graphing and Scryfalls API's to represent one of my favorite hobbies. After struggling with 
-					the D3.js program I was able to get some interesting anad interactable graphs and charts that satisfied my needs.
+				<p>Jack Wilhelm - Using brain.js was difficult at first but quickly became an interesting endeavor. The network definetly is faulty and could use some more training but I belive it's interesting
+					to see the capabilities of a lesser trained brain. The program also acts kind of like a game to see if the user can make a sensible story from the programs babbling. Getting to learn some new libraries was definetly exciting 
+					but I wish I could have worked more on it in spite of the capstone taking a large portion of my time.
 				</p>
 			</div>
 

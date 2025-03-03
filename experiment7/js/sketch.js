@@ -87,6 +87,8 @@ const functionWords = [
   "is", "are", "am", "was", "were", "been", "being"
 ];
 
+let roboFilledWord = false;
+
 
 
 // setup() function is called once when the program starts
@@ -5672,7 +5674,7 @@ let outputData = "Word data:";
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  
+  textSize(32);
   background(220);    
   // call a method on the instance
   myInstance.myMethod();
@@ -5700,6 +5702,7 @@ function draw() {
   fill("red");
   rect(0, canvasContainer.height()-50, canvasContainer.width(), 50)
   fill("black");
+  textSize(25);
   text(outputData, 0, canvasContainer.height()-50,)
 }
 
@@ -5709,7 +5712,8 @@ function keyTyped() {
     let recentWords = recentText.split(" ");
     let lastWord = recentWords.pop();
     typedText += " ";
-    if (typedText.length > 20 && Math.random() < 0.5 && functionWords.includes(lastWord)) {
+    if (typedText.length > 20 && Math.random() < 0.5 && functionWords.includes(lastWord) && !roboFilledWord) {
+      roboFilledWord = true;
       let output = net.run(createArrayFromString(recentText));
       let maxLabel = "";
     let maxValue = -Infinity;
@@ -5728,6 +5732,10 @@ function keyTyped() {
   } else {
     typedText += key;
   }
+  if (/[\.,!?;:]/.test(key)) {
+    roboFilledWord = false;
+    console.log("help")
+  }
 }
 
 function keyPressed() {
@@ -5736,6 +5744,7 @@ function keyPressed() {
     return false;
   }
   if (keyCode === ENTER) {
+    roboFilledWord = true;
     let recentText = typedText.slice(-50);
     typedText += " ";
       let output = net.run(createArrayFromString(recentText));
