@@ -5663,9 +5663,10 @@ function createArrayFromString(string) {
   return inputArray;
 }
 
-let maxLabel = "";
-let maxValue = -Infinity;
-let wordsToHighlight = ["sample", "highlighted"];
+
+let wordsToHighlight = [];
+let scrollY = 0;
+let outputData = "Word data:";
 
 
 
@@ -5678,13 +5679,13 @@ function draw() {
   
   //text(typedText, 20, 100, canvasContainer.width());
   let x = 10;
-  let y = 10;
+  let y = scrollY + 10;
   let lineHeight = 30;
 
   let words = typedText.split(" ");
   
   for (let i = 0; i < words.length; i++) {
-    if (wordsToHighlight.includes(words[i])) {
+    if (wordsToHighlight.includes(i)) {
       fill(255, 0, 0);
     } else {
       fill(0);
@@ -5696,6 +5697,10 @@ function draw() {
     text(words[i], x, y, canvasContainer.width);
     x += textWidth(words[i]) + 10;
   }
+  fill("red");
+  rect(0, canvasContainer.height()-50, canvasContainer.width(), 50)
+  fill("black");
+  text(outputData, 0, canvasContainer.height()-50,)
 }
 
 function keyTyped() {
@@ -5706,13 +5711,18 @@ function keyTyped() {
     typedText += " ";
     if (typedText.length > 20 && Math.random() < 0.5 && functionWords.includes(lastWord)) {
       let output = net.run(createArrayFromString(recentText));
+      let maxLabel = "";
+    let maxValue = -Infinity;
       for (let label in output) {
         if (output[label] > maxValue) {
           maxValue = output[label];
           maxLabel = label;
         }
       }
-      typedText += random(wordDictionary[maxLabel]) + " ";
+      wordsToHighlight.push(typedText.split(" ").length - 1);
+      typedText += random(wordDictionary[maxLabel]);
+      console.log(output);
+      setOutputData(output);
     }
     return false;
   } else {
@@ -5725,6 +5735,52 @@ function keyPressed() {
     typedText = typedText.slice(0, -1);
     return false;
   }
+  if (keyCode === ENTER) {
+    let recentText = typedText.slice(-50);
+    typedText += " ";
+      let output = net.run(createArrayFromString(recentText));
+      let maxLabel = "";
+    let maxValue = -Infinity;
+      for (let label in output) {
+        if (output[label] > maxValue) {
+          maxValue = output[label];
+          maxLabel = label;
+        }
+      }
+      wordsToHighlight.push(typedText.split(" ").length - 1);
+      typedText += random(wordDictionary[maxLabel]);
+      console.log(output);
+    setOutputData(output);
+    return false;
+  }
+  if (keyCode === DOWN_ARROW) {
+    scrollY += 20;
+    return false;
+  } else if (keyCode === UP_ARROW) {
+    scrollY =  Math.max(scrollY - 20, 0)
+    return false;
+  }
+}
+
+function setOutputData(output) {
+  let data = [];
+  for (let label in output) {
+    data.push({type: label, sure: output[label]});
+  }
+  data.sort((a, b) => b.sure - a.sure);
+  let outputDataText = "Word data: ";
+  for (let entry in data) {
+    if (data[entry].type == "PTVerb") {
+      outputDataText += "Past Tense Verb: "
+    } else if (data[entry].type == "PNoun") {
+      outputDataText += "Plural Noun: "
+    } else {
+      outputDataText += data[entry].type + ": "
+    }
+    outputDataText += parseFloat((data[entry].sure).toFixed(2)) + " ";
+  }
+  
+  outputData = outputDataText;
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
