@@ -5679,17 +5679,22 @@ function draw() {
   //text(typedText, 20, 100, canvasContainer.width());
   let x = 10;
   let y = 10;
+  let lineHeight = 30;
 
   let words = typedText.split(" ");
   
   for (let i = 0; i < words.length; i++) {
     if (wordsToHighlight.includes(words[i])) {
-      fill(255, 0, 0); // Red for highlighted words
+      fill(255, 0, 0);
     } else {
-      fill(0); // Black for other words
+      fill(0);
     }
-    text(words[i], x, y);
-    x += textWidth(words[i]) + 10; // Move the x position to the next word
+    if (x + textWidth(words[i]) + 10> canvasContainer.width()) {
+      x = 10;
+      y += lineHeight;
+    }
+    text(words[i], x, y, canvasContainer.width);
+    x += textWidth(words[i]) + 10;
   }
 }
 
